@@ -53,3 +53,14 @@
 
 *Transformers timeline*
 ![alt timeline](images/1-hello-transformers/transformers-timeline.png)
+
+## Hugging Face Transformers
+
+Hugging face Transformers made lifer easier for ml practitioniers to apply transformer models from research papers and different frameworks.
+
+Without Transformers library, we'll probabaly have to code the architecture, import pretrained weights from a server, Preprocess data, Create Dataloader, loss, optimizer and train the modek to our specific task. All these steps are avoided with the help of Transformers library.
+
+### pipeline
+
+* `pipeline()` is the highest level of abstraction in transformers API.
+* We can just instantiate pipeline(<task-name>) and pass the text to pipeline object, this will return prediction results.
