@@ -64,3 +64,30 @@ Without Transformers library, we'll probabaly have to code the architecture, imp
 
 * `pipeline()` is the highest level of abstraction in transformers API.
 * We can just instantiate pipeline(<task-name>) and pass the text to pipeline object, this will return prediction results.
+
+> Note: All different application tour is covered in [1-hello-transformers.ipynb](../notebooks/1-hello-transformers.ipynb)
+
+The models used in the notebook are trained models, where were these models trained, how to fine tune models to a specific task? all these questions will be covered in upcooming notebooks.
+
+## The Hugging Face Ecosystem
+
+Trnasformers provide a big ecosystem of tools to train, finetune, share reproduce machine learning workflow.
+
+The Hugging Face ecosystem can be seperated into two:- Libraries(code) and Hub(pretrained model, weights, datasets, scripts, evaluation metrics and more).
+
+*Ecosystem*
+![alt ecosystem](images/1-hello-transformers/ecosystem.png)
+
+Transformers was covered briefly above and will be discussed in other notebooks.
+
+### The Hugging Face Hub
+
+* Hub enables transfer learning by provifin access to more than 20,000 models. There are filters for tasks, frameworks, datasets and more to help navigation of hub.
+* In addition to model weights, Hub also hosts datasets, scripts for computing metrics to reproduce published results or leverage additional data for application.
+* *model* and *dataset cards* allow us to document contents of models and datasets to decide the right model for the problem.
+
+### Other components
+
+* Tokenizer --> Numerical representation of text
+* Datasets --> Standard format to store datasets, memory mapping to use virtual memory and optimization
+* Accelearte --> Training loops
