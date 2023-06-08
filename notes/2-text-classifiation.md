@@ -16,3 +16,4 @@ A typical model fine-tuning with datasets, tokenizers, transformers looks like b
 ## Reading List
 
 1. [Datasets documentation](https://huggingface.co/docs/datasets/index)
+2. [Andrei Karpathy's recipe to train neural networks](https://karpathy.github.io/2019/04/25/recipe/)
