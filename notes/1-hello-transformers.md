@@ -63,7 +63,8 @@ Without Transformers library, we'll probabaly have to code the architecture, imp
 ### pipeline
 
 * `pipeline()` is the highest level of abstraction in transformers API.
-* We can just instantiate pipeline(<task-name>) and pass the text to pipeline object, this will return prediction results.
+* We can ju
+st instantiate pipeline(<task-name>) and pass the text to pipeline object, this will return prediction results.
 
 > Note: All different application tour is covered in [1-hello-transformers.ipynb](../notebooks/1-hello-transformers.ipynb)
 
