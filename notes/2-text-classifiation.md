@@ -26,6 +26,19 @@ Tokenizer are used to convert raw text to input_ids. Tokenizer might use one of 
 * `convert_tokens_to_string()` --> to convert tokens to string.
 * `vocab_size`, `model_max_length`, `model_input_names` are some params available with tokenizer.
 
+## Feature Extraction
+
+* Feature extraction is getting vector representations(last hidden state) from a pretrained model for our inputs.
+* These n-dimension hiddens states goes through a dimension reduction with Umap.
+* Then a sciki-learn classifier is trained
+* This method is good choice for a less compute constraint.
+
+## Fine Tune
+
+* Fine tune is train the entire pretrained model to the current dataset
+* Training the classification head
+
+
 ## Reading List
 
 1. [Datasets documentation](https://huggingface.co/docs/datasets/index)
