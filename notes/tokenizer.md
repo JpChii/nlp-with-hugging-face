@@ -69,3 +69,4 @@ Now text becomes like below,
 * `vocab_size` --> Vocab size of respective transformer
 * `max_model_lenght` --> maximum sequence length of transformer
 * `input_name` --> input names required for transformer
+* `is_split_into_words`(bool) --> If the sequence is already split into tokens, set this to True to convert it to integers without splitting.
