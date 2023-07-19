@@ -63,6 +63,13 @@ Now text becomes like below,
 ## Methods
 
 * `convert_ids_to_tokens()` --> To convert tokenizer input_ids to string.
+* `encode()` --> To tokenize a sequence and convert it to ID's from vocab
+```Python
+# Encoding sequence to input ids
+from transformers import XXXTokenier
+tokenizer = XXXTokenizer.from_pretrained("checkpoint")
+input_ids = tokenizer.encode(text, return_tensors="pt")
+```
 
 ## Attributes
 
@@ -70,3 +77,8 @@ Now text becomes like below,
 * `max_model_lenght` --> maximum sequence length of transformer
 * `input_name` --> input names required for transformer
 * `is_split_into_words`(bool) --> If the sequence is already split into tokens, set this to True to convert it to integers without splitting.
+* `tokens()` --> Gives back tokens, sequence split to words
+```Python
+tokens = tokenizer(text).tokens()
+```
+* `word_ids()` --> This method provides word id for each word in a sequence. When tokenizer split into sub-words, all the sub-words of single word will have same word id which is index of that word when it was split based on space during pretokenization step.
