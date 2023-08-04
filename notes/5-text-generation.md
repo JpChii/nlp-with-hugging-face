@@ -54,3 +54,11 @@ The simplest decoding method to get discrete tokens from a model's continuous ou
 
 *Greedy search decoding argmax*
 ![alt](../notes/images/5-text-generation/greedy-search-decoding.png)
+
+## Beam Search Decoding
+
+Instead of decoding with the next highest probable token, beam search decoding keeps track of the *top-b* most probable next tokens, where *b* is refrred to as *number of beam* or *partial hypotheses. Then the next set of beams will be chose based on the current beams. This process is repeated until eos token or max_length. Finally the sequence is selected based on ranking the *b* beams accordig to log probabalities or the beam path of a sequence with highest probabality.
+
+![beam-search-decoding-with-two-beams](../notes/images/5-text-generation/beam-search-with-two-beams.png)
+
+Check the notebook to calculate log probablity score for a sequence.
