@@ -62,3 +62,55 @@ Instead of decoding with the next highest probable token, beam search decoding k
 ![beam-search-decoding-with-two-beams](../notes/images/5-text-generation/beam-search-with-two-beams.png)
 
 Check the notebook to calculate log probablity score for a sequence.
+
+## Inference on decoding methods
+
+* Beam search with n-gram penalty is a good way to find a trade-off between focusing on high-probabality tokens(with beam search) while reducing repitions(with n-gram penalty). This is commonly used in application such as summarization or machine translation where factual correctness is important.
+
+* Another alternative to reduce reptitions with increase increase in text diversity and reduced factual corectness(chatbot, story generation applications) we can use sampling. We'll explore sampling next.
+
+## Sampling Methods
+
+The simplest sampling method is to randomly sample from the probabality distribution of the model's outputs over the full vocabulary at each timestep.
+
+We can easily control the diversity of the output by adding a temperature parameter T that rescales the logits before taking the softmax.
+
+By Tuning T we can control the shape of the probabality distribution. When T << 1, the distribution becomes peaked around the origin and the rare tokens are suppressed. On the other hand wher T >>1 the distribution flattens out and each token becomes equally likely. Let's observe this effect of temeperature on token probabalities next.
+
+The text with low temperature is more coherent.
+
+> **Note**: Main point with temperature is it allow us to control the quality of the samples, but there's always a trade-off between coherence(low temperature) and diversity(high temperature) that one has to tune to the use case at hand.
+
+Another way to adjust the trade-off between coherence and diversity is to truncate the distribuion of the vocabulary. This allows us to adjust the diversity freely with temperature but with a limit that excludes word that would be too strange in the context(i.e low probabality words). There are two main ways to do this top-k and nucleus sampling.
+
+## Top-k and Nucleus Sampling
+
+Top-k and nucleues(top-p) sampling are two popular alternatives or extensions to using temperature. In both cases, the basic idea is to restrict the number of possible tokens we can sample from at each timestep. To see how this works, let's first visualize the cumulative probabality distirbution of the model's outputs at T=1.
+
+### Top-k sampling
+
+The idea of top-k sampling is to select tokens from the top k tokens alone. We'll be cutting the tokens tail at the point k to make sure tokens with less probabality are not sampled.
+
+Looking again at the graph, we can say it's like drawing a vertical line on a decreasing probabality of tokens.
+
+We can do this easily with `generate()` function and `top_k` argument.
+
+### Top-P sampling
+
+In Top-P sampling we set a probabality limit,
+* tokens are first sorted in descending order of probabality
+* Then tokens probabality are added cumulativley until we reach this limit. Once we reach this limit, all the tokens contributed to this mass(limit we set) are selected.
+* From this group of tokens next token is sampled.
+
+With respect to the plot, this can be considered as a horizontal line in decresing tokens probabality and all the tokens below it can be used for sampling.
+
+This makes it dynamic with respect to output distribution at each time step instead of a static count like top-k sampling.
+
+We can implement this with `generate()` by passing `top_p` paramter.
+
+## Which decoding method is best?
+
+There is no *best* decoding method, it all depends on the nature of task to genrate text for?
+
+* Use greedy search in combination with beam search for arithemetic or providing answer to a specific question.
+* To generate diverse text, use sampling methods like temperature, top_k, top_p or a combination from three.
