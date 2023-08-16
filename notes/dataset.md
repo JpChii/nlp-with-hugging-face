@@ -1,4 +1,4 @@
-# Dataset
+# Datasets
 
 Hugging Face Datasets, This markdown will serve as a place to recall important points on Datasets library.
 
@@ -26,3 +26,13 @@ hub --> Hugging face Hub
         return {"ner_tags_str": [tags.int2str(idx) for idx in batch["ner_tags"]]}
     panx_de = panx_ch["de"].map(create_tag_names)
     ```
+
+## Metric
+
+Datasets library holds Metric class, which provides access to implementations of metrics like seqeval, bleu.
+
+```Python
+# Access untraditional metrics
+from datasets import load_metric
+seq_eval = load_metric("seqeva")
+```
