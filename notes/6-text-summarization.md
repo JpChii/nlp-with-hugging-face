@@ -125,3 +125,32 @@ Haaaa! Enough with the theory, let's calculate some scores. How can we do this, 
 The BLEU score is widely used for evaluating machine translations where precise translations are favoured over translations that include all possible words.
 
 For summarization, we want all the important information in the generated text which is opposite of BLEU and favours high recall. This is where the ROUGE score is used.
+
+### ROUGE
+
+ROUGE score is specifically developed for applications like summarization where recall is important than precision. The approach is similar to BLEU where we check the n-grams in generated text is present in reference or not(precision checks if the generated text is correct or not). In ROUGE, we check whether the n-grams in reference text is present in generated text or not(recall whether all bits in reference is present in generated or not).
+
+To do this we reverse the precision metric, we count the unclipped reference n-grams in the generated text in denominator. This is ROUGE-N. where N specifies the n-gram size.
+
+$ROUGE-N = \frac{\sum_{snt' \in C} \sum_{\text{n-gram} \in snt'} \text{Count}_{\text{match}}(\text{n-gram})}{\sum_{snt' \in C} \sum_{\text{n-gram} \in snt'} \text{Count}(\text{n-gram})}
+$
+
+This was the original proposal for rouge. Subsequently fully removing precision has strong negative effects. Going back to BLEU formula without clipped counting, we can measure precision as well, and then combine these two in an harmonice mean to get an F1-score. This is the metric commonly report for ROUGE nowadays(16thaug2022).
+
+There is another way to evaluate summarization by comparing the longest common substring in reference and generated text which is done by ROUGE-L.
+Example LCS for "abab", "abc" is "ab" with length of 2. If we're to calculate the score between two sequences, we've to normalzie them to avoid advantage to the longer sequence. To normalize the author of ROUGE came up with F-score-like scheme where the LCS is normalized with length of reference and generated text then they are mixed together.
+
+Normalized ref:
+
+$R_{\text {LCS}} = \frac{LCS(X, Y)}{m}
+$
+
+Normalized generation:
+$P_{\text {LCS}} = \frac{LCS(X, Y)}{m}
+n$
+
+$\beta = \frac{R_{\text {LCS}}}{R_{\text {LCS}}}$
+
+F-like LCS:
+
+$F_{\text {LCS}} = \frac{(1 + \beta^2) \cdot R_{\text {LCS}} \cdot P_{\text {LCS}}}{R_{\text {LCS}} + \beta \cdot P_{\text {LCS}}}$
