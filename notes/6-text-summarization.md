@@ -154,3 +154,38 @@ $\beta = \frac{R_{\text {LCS}}}{R_{\text {LCS}}}$
 F-like LCS:
 
 $F_{\text {LCS}} = \frac{(1 + \beta^2) \cdot R_{\text {LCS}} \cdot P_{\text {LCS}}}{R_{\text {LCS}} + \beta \cdot P_{\text {LCS}}}$
+
+This way LCS score is properly normalized and compared across samples. There are two implementation of ROUGE availabel in Datasets:
+
+* Calculate scores per sentence and average it for summaries(ROUGE-L)
+* Caclualtes for entire summary (ROUGE-Lsum).
+
+> **Note**: The Rouge metric in the datasets library callcuate confidence intervals by default, 5th percentile(low) and 95th percentile(high), average scores is tored in mid.
+
+### Evaluation metrics summary
+
+BLEU (Bilingual Evaluation Understudy) and ROUGE (Recall-Oriented Understudy for Gisting Evaluation) are both evaluation metrics commonly used in natural language processing and machine translation tasks, but they have different focuses and approaches.
+
+BLEU:
+
+BLEU is primarily used for evaluating the quality of machine translations by comparing them to one or more reference translations.
+It measures the similarity between the machine-generated output and the reference translations based on n-gram overlap.
+BLEU assigns a score between 0 and 1, where higher scores indicate better translation quality.
+BLEU does not consider the order of words or their meaning, focusing more on the n-gram matches.
+It is based on precision, where higher precision indicates more matching n-grams.
+ROUGE:
+
+ROUGE is used for evaluating summarization tasks, such as text summarization or generating summaries from documents.
+It measures the quality of summaries by comparing them to one or more reference summaries.
+ROUGE calculates various metrics, such as ROUGE-N (n-gram overlap), ROUGE-L (longest common subsequence), ROUGE-S (skip-bigram), and more.
+ROUGE assigns a score between 0 and 1, where higher scores indicate better summary quality.
+ROUGE considers the order of words and their meaning, focusing on capturing the gist or important information in the summary.
+In summary, BLEU is typically used for evaluating machine translations, while ROUGE is used for evaluating summarization tasks. BLEU focuses on n-gram overlap and precision, while ROUGE considers the order and meaning of words to capture the summary's important information.
+
+# Conclusion
+
+Text summarization poses unique challenges compared to text classification, ner, question answering. BLEU and ROUGE are metrics that can better evaluate generated texts.
+
+Still there is no single strategy to solve the context problem, where documents are too big...! To this date this is still an open and active research question. Recently OpenAI showed how to scale summarization by applying it recursivley to long documents and using huma feedback in the loop.
+
+Next we'll look at question answerig, unlike summarization we can scale this to entire documents.
