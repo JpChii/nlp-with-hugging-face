@@ -70,6 +70,11 @@ from transformers import XXXTokenier
 tokenizer = XXXTokenizer.from_pretrained("checkpoint")
 input_ids = tokenizer.encode(text, return_tensors="pt")
 ```
+* `decode()` --> To dekoenizer any tokenized input like input_ids, etc,
+```Python
+tokenizer.decode(input_ids[0])
+print(tokenizer.decode(inputs["input_ids"][0]))
+```
 
 ## Attributes
 
@@ -82,3 +87,7 @@ input_ids = tokenizer.encode(text, return_tensors="pt")
 tokens = tokenizer(text).tokens()
 ```
 * `word_ids()` --> This method provides word id for each word in a sequence. When tokenizer split into sub-words, all the sub-words of single word will have same word id which is index of that word when it was split based on space during pretokenization step.
+
+## Outputs
+
+* `token_type_ids` --> this is used to differentiate two segments of inputs where it's passed as pair. Ex in QA inputs question tokens will have token_type_ids as 0 and context will have 1.
