@@ -63,14 +63,14 @@ Now text becomes like below,
 ## Methods
 
 * `convert_ids_to_tokens()` --> To convert tokenizer input_ids to string.
-* `encode()` --> To tokenize a sequence and convert it to ID's from vocab
+* `encode()` --> To tokenize a sequence and convert it to ID's from vocab. This gives tokens as a list.
 ```Python
 # Encoding sequence to input ids
 from transformers import XXXTokenier
 tokenizer = XXXTokenizer.from_pretrained("checkpoint")
 input_ids = tokenizer.encode(text, return_tensors="pt")
 ```
-* `decode()` --> To dekoenizer any tokenized input like input_ids, etc,
+* `decode()` --> To dekoenizer any tokenized input like input_ids, etc. This gives output as a single string of tokens joined together.
 ```Python
 tokenizer.decode(input_ids[0])
 print(tokenizer.decode(inputs["input_ids"][0]))
