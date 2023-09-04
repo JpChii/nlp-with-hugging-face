@@ -76,7 +76,7 @@ tokenizer.decode(input_ids[0])
 print(tokenizer.decode(inputs["input_ids"][0]))
 ```
 
-## Attributes
+## Attributes/Parameters
 
 * `vocab_size` --> Vocab size of respective transformer
 * `max_model_lenght` --> maximum sequence length of transformer
@@ -87,6 +87,7 @@ print(tokenizer.decode(inputs["input_ids"][0]))
 tokens = tokenizer(text).tokens()
 ```
 * `word_ids()` --> This method provides word id for each word in a sequence. When tokenizer split into sub-words, all the sub-words of single word will have same word id which is index of that word when it was split based on space during pretokenization step.
+* return_overflowing_tokens -> To enable slidiing window to avoid  trunctaion
 
 ## Outputs
 
