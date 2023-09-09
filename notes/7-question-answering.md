@@ -127,3 +127,5 @@ A document-oriented database that stors documents and metadata which are provide
 Combines all the components of QA system to enable custom query flows, merging documents from multiple retrievers and more.
 
 Next we'll explore how to build a prototype popeline and then focus on improving it's performance.
+
+For an implementation of document store, retriever, reader refer the respective notebook.
