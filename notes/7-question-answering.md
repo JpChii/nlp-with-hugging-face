@@ -129,3 +129,7 @@ Combines all the components of QA system to enable custom query flows, merging d
 Next we'll explore how to build a prototype popeline and then focus on improving it's performance.
 
 For an implementation of document store, retriever, reader refer the respective notebook.
+
+
+> **Note:** Irrespective of recent research on QA has focused on readin comprehnsion models, the performance of QA will be bad if the retriever can't find the relevant documents for the query. Retriever set's an upper bound on the performance of reader(reading comprehension models). With this in mind let's look at some common metrics to evaluate the retriever so that we can compare the performance of sparse and dense representations.
+
