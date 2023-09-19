@@ -130,6 +130,39 @@ Next we'll explore how to build a prototype popeline and then focus on improving
 
 For an implementation of document store, retriever, reader refer the respective notebook.
 
+## Improving QA Pipeline
 
 > **Note:** Irrespective of recent research on QA has focused on readin comprehnsion models, the performance of QA will be bad if the retriever can't find the relevant documents for the query. Retriever set's an upper bound on the performance of reader(reading comprehension models). With this in mind let's look at some common metrics to evaluate the retriever so that we can compare the performance of sparse and dense representations.
 
+For developing a good QA system, we can go throught the below steps,
+
+* Evaluate the retriever(pretrained on a dataset)
+* Evaluate the reader(pretrained on a dataset)
+* Check if the metrics and results are good
+* If not, perform a domain adaptation of reader and retriever on the dataset.
+
+All the above steps can be performed with reader retriever `eval()` and `train()` function from hasytack for extractive QA with metrics(EM and F1).
+
+### Evaluating the Retriever
+
+A common metric for evaluating the retriever is *recall*, which measure the fraction of all relevant documents that can be retrieved. Here relevant mean the number of top_k documents retrieved has the answer in them. This can be computed by counting the number of times an answer occurs in the top_k documents.
+
+10 top_k documents, answer appers in 8 of them, recall will be 80%.
+
+In Haystackm there are two ways to evaluate retrievers:
+
+* Retrievers built in `eval()` method. This can be used for both open and closed-domain QA. But for dataset like QA where each document is paired with a product and needs to be filterd by Product id for every query.
+
+### Evaluating the Reader
+
+In extractive QA, there are two main metrics that are used for evaluating the reader:
+
+*Exact Match (EM)*
+
+A binary metric that gives EM=1 if the characters in the predicted and ground truth match exactly and EM=0 otherwise. If no answer is expected, the model gets EM=0 if it predicts any text all.
+
+*F1-score*
+
+Harmonic mean of precision and recall.
+
+Let's see how these metrics wit some helper functions from FARM over a simple example.

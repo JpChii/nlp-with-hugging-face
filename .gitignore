@@ -4,3 +4,4 @@
 .mentat/
 others/.env
 haystack/
+models/
