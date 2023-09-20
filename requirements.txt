@@ -20,4 +20,4 @@ scikit-multilearn==0.2.0
 # Chapter 10 - Pretraining
 psutil
 accelerate==0.5.1
-farm-haystack==0.9.0
+# farm-haystack==0.9.0

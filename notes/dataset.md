@@ -18,7 +18,10 @@ hub --> Hugging face Hub
     ```Python
     # Accessing ner_tags of a subset of xtreme dataset
     tags = panx_ch["de"]["train"].features["ner_tags"].feature
+    # For clinc dataset
+    clinc["test"].features['intent'].names 
     ```
+    Check the ClassLabel column to access the labels
 * Dataset offers a `ClassLabel` class for labels, using `ClassLabel.int2str()` we can convert our numerical labels or ner_tags to strings for better visualization of data
     ```Python
     # This code will add ner_tags_str to the dataset and creates a text representation of ner tags
