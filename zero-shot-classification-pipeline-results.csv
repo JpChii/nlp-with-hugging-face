@@ -1,0 +1,3514 @@
+,label_ids,labels,text,predicted_labels,scores
+0,[0 0 0 1 0 0 0 0 0],['new model'],"Implementing efficient self attention in T5
+
+# 🌟 New model addition
+
+My teammates and I (including @ice-americano) would like to use efficient self attention methods such as Linformer, Performer and Nystromformer
+
+## Model description
+
+These new methods serve as approximations of regular attention, but reduce complexity from quadratic in the inputs to linear.  We would like to add a parameter to T5 where users can specify an efficient attention method to use instead of regular attention.  Ideally, this would be implemented across all models, but the models tend to have varying implementations of attention, rendering this generalization fairly tedious.
+
+## Open source status
+
+* [x] the model implementation is available: repos are https://github.com/mlpen and https://github.com/lucidrains/performer-pytorch
+* [ ] the model weights are available: N/A
+* [x] who are the authors: @mlpen and @lucidrains
+","['new model' 'pytorch' 'documentation' 'usage' 'pipeline' 'examples'
+ 'tensorflow or tf' 'model training' 'tokenization']","[0.98832756 0.93054521 0.65016943 0.43521237 0.3779034  0.33738959
+ 0.21949352 0.19279322 0.16027932]"
+1,[0 0 0 1 0 0 0 0 0],['new model'],"Uploaded a new model but is not found on the hub.
+
+# 🌟 New model addition
+I recently added this model: https://huggingface.co/flexudy/t5-small-wav2vec2-grammar-fixer
+
+However, I get this error whilst trying to download it.
+```
+Can't load tokenizer for 'flexudy/t5-small-wav2vec2-grammar-fixer'
+```
+How can I fix it please?
+","['new model' 'tokenization' 'usage' 'pipeline' 'examples' 'pytorch'
+ 'tensorflow or tf' 'model training' 'documentation']","[0.99767667 0.99106663 0.90470535 0.68311721 0.59388232 0.37438673
+ 0.35398063 0.25810251 0.20934486]"
+2,[0 1 0 0 0 0 0 0 0],['examples'],"[example scripts] inconsistency around eval vs val
+
+* `val` == validation set (split)
+* `eval` == evaluation (mode)
+
+those two are orthogonal to each other - one is a split, another is a model's run mode.
+
+the trainer args and the scripts are inconsistent around when it's `val` and when it's `eval` in variable names and metrics. 
+
+examples:
+* `eval_dataset` but `--validation_file`
+* `eval_*` metrics key for validation dataset - why the prediction is then `test_*` metric keys?
+* `data_args.max_val_samples` vs `eval_dataset` in the same line
+
+the 3 parallels:
+- `train` is easy - it's both the process and the split
+- `prediction` is almost never used in the scripts it's all `test` - var names and metrics and cl args
+- `eval` vs `val` vs `validation` is very inconsistent. when writing tests I'm never sure whether I'm looking up `eval_*` or `val_*` key. And one could run evaluation on the test dataset.
+
+Perhaps asking a question would help and then a consistent answer is obvious:
+
+Are metrics reporting stats on a split or a mode? 
+A. split - rename all metrics keys to be `train|val|test`
+B. mode - rename all metrics keys to be `train|eval|predict`
+
+Thank you.
+
+@sgugger, @patil-suraj, @patrickvonplaten ","['examples' 'model training' 'tensorflow or tf' 'pytorch' 'usage'
+ 'tokenization' 'documentation' 'pipeline' 'new model']","[0.87972641 0.6282903  0.48422283 0.47514036 0.36468726 0.21407649
+ 0.17486711 0.15419117 0.09358928]"
+3,[0 0 0 1 0 0 0 0 0],['new model'],"PruneTrain: Fast Neural Network Training by Dynamic Sparse Model Reconfiguration
+
+# 🚀 Feature request
+
+PruneTrain. {...} By using a structured-pruning approach and additional reconfiguration techniques we introduce, the pruned model can still be efficiently processed on a GPU accelerator. Overall, **PruneTrain achieves a reduction of 39% in the end-to-end training time of ResNet50 for ImageNet by reducing computation cost by 40% in FLOPs, memory accesses by 37% for memory bandwidth bound layers, and the inter-accelerator communication by 55%.**
+
+## Motivation
+
+I'm pre-training some midsize language models from scratch. If you tell me that I can pretrain a network with 1% drop in performance while cutting down the energy demand of the training by up to 40% and speeding inference time at the same time, I will buy it.
+
+## Your contribution
+
+https://arxiv.org/abs/1901.09290. I can not understand why the authors did not open source the code, since it could reduce the global warming, speedup experimentation and reduce energy consumption. ","['model training' 'new model' 'pipeline' 'usage' 'pytorch' 'examples'
+ 'tensorflow or tf' 'documentation' 'tokenization']","[0.95176637 0.77932763 0.5318315  0.46988273 0.41050273 0.35380191
+ 0.19127201 0.10599361 0.1049927 ]"
+4,[0 0 0 0 0 1 0 0 0],['pytorch'],"[Good first issue] DistilBERT PyTorch Integration tests
+
+The PyTorch implementation of the DistilBERT model currently has no integration tests. This is problematic as the behavior can diverge without being noticed.
+
+The [test_modeling_distilbert.py](https://github.com/huggingface/transformers/blob/master/tests/test_modeling_distilbert.py) file should be updated to include integration testing.
+
+An example of a good modeling integration test is visible in the [test_modeling_bert.py#L552-L565](https://github.com/huggingface/transformers/blob/master/tests/test_modeling_bert.py#L552-L565) file:
+
+https://github.com/huggingface/transformers/blob/1809de5165804666ba6c6a02a9d177f6683869cc/tests/test_modeling_bert.py#L552-L565
+
+Some additional tips:
+- The test must be marked as slow using the `@slow` decorator, so as to be run *daily*, and not on every commit of every branch/pull request of this repository.
+- The test must be decorated with the `@require_torch` decorator so as to only be run in environments using PyTorch.
+- A single test is necessary. If you feel like implementing multiple of these, then sharing the same checkpoint would be ideal so as to reduce download time.","['examples' 'pytorch' 'new model' 'usage' 'pipeline' 'tokenization'
+ 'tensorflow or tf' 'documentation' 'model training']","[0.50972372 0.47688156 0.39876619 0.22207801 0.17535661 0.10985965
+ 0.06201454 0.054931   0.04806838]"
+5,[0 0 0 0 0 0 1 0 0],['tensorflow or tf'],"[Good first issue] ALBERT TensorFlow Integration tests
+
+The TensorFlow implementation of the ALBERT model currently has no integration tests. This is problematic as the behavior can diverge without being noticed.
+
+The [test_modeling_tf_albert.py](https://github.com/huggingface/transformers/blob/master/tests/test_modeling_tf_albert.py) file should be updated to include integration testing.
+
+An example of a good modeling integration test is visible in the [test_modeling_tf_bert.py#L365-L387](https://github.com/huggingface/transformers/blob/1809de5165804666ba6c6a02a9d177f6683869cc/tests/test_modeling_tf_bert.py#L365-L387) file:
+
+https://github.com/huggingface/transformers/blob/1809de5165804666ba6c6a02a9d177f6683869cc/tests/test_modeling_tf_bert.py#L365-L387
+
+Some additional tips:
+- The test must be marked as slow using the `@slow` decorator, so as to be run *daily*, and not on every commit of every branch/pull request of this repository.
+- The test must be decorated with the `@require_tf` decorator so as to only be run in environments using PyTorch.
+- A single test is necessary. If you feel like implementing multiple of these, then sharing the same checkpoint would be ideal so as to reduce download time.","['examples' 'pytorch' 'new model' 'tensorflow or tf' 'usage' 'pipeline'
+ 'tokenization' 'model training' 'documentation']","[0.46878168 0.45562407 0.42343155 0.39083859 0.20818272 0.15348606
+ 0.08743157 0.07002939 0.03766158]"
+6,[0 0 1 0 0 0 0 0 0],['model training'],"ConvBERT Model
+
+","['new model' 'model training' 'usage' 'documentation' 'examples'
+ 'tokenization' 'pipeline' 'tensorflow or tf' 'pytorch']","[0.89201474 0.61509854 0.36170748 0.20354989 0.18808714 0.06008447
+ 0.031818   0.01308552 0.0042145 ]"
+7,[0 0 0 1 0 0 0 0 0],['new model'],"Adding Megatron models.
+
+# 🌟 New model addition
+
+Is it feasible to add  Megatron models ? It seems the architecture is really just a GPT2, most of the work should be in creating the config, fusing layers from the available weights here: https://github.com/pytorch/fairseq/tree/master/examples/megatron_11b and making them available.
+
+There are Nvidia's megatron (Bert and Gpt variants) and Facebook-11b megatron  (gpt variant)
+
+If we stick to that then we can't run the model on a single GPU, so we should probably make sure this is compatible with: 
+
+- https://github.com/huggingface/transformers/pull/9208
+- https://github.com/huggingface/transformers/pull/9211
+
+**Is keeping the current GPT2 architecture and using deepspeed's ZeRo and other parallelism schemes without touching original implementation feasible?**
+
+
+## Model description
+
+https://github.com/pytorch/fairseq/blob/e3c4282551e819853952284681e9ed60398c5c4a/examples/megatron_11b/README.md
+
+<!-- Important information -->
+
+## Open source status
+
+* [x] the model implementation is available: https://github.com/ngoyal2707/Megatron-LM/blob/adb23324c222aad0aad89308e70302d996a5eaeb/mpu/transformer.py (Most of the work seems to be on Matrix parallelization)
+* [x] the model weights are available: https://dl.fbaipublicfiles.com/fairseq/models/model_parallel/megatron_11b.tar.gz (Megatron 11b), https://github.com/NVIDIA/Megatron-LM#downloading-checkpoints (Nvidia's version, 3b and 8.3b don't seem to be available)
+* [x] who are the authors: (mention them, if possible by @gh-username) Mohammad Shoeybi, Mostofa Patwary, Raul Puri, Patrick LeGresley, Jared Casper, Bryan Catanzaro https://arxiv.org/abs/1909.08053
+
+https://developer.nvidia.com/blog/language-modeling-using-megatron-a100-gpu/
+
+@stas00 @patrickvonplaten 
+","['new model' 'pytorch' 'examples' 'documentation' 'usage' 'pipeline'
+ 'tokenization' 'tensorflow or tf' 'model training']","[0.9924944  0.9470582  0.87549132 0.52853137 0.51417977 0.48018846
+ 0.26587337 0.20386499 0.15287416]"
+8,[0 0 0 1 0 0 0 0 0],['new model'],"Add BORT
+
+Hi,
+
+this PR adds the recently introduced BORT model from @adewynter and Daniel J. Perry from the Alexa team into Transformers.
+
+----
+
+BORT was introduced in the [Optimal Subarchitecture Extraction For BERT](https://arxiv.org/abs/2010.10499).
+
+Details about BORT:
+
+> We extract an optimal subset of architectural parameters for the BERT architecture from Devlin et al. (2018) by applying recent breakthroughs in algorithms for neural architecture search. This optimal subset, which we refer to as ""Bort"", is demonstrably smaller, having an effective (that is, not counting the embedding layer) size of 5.5% the original BERT-large architecture, and 16% of the net size. Bort is also able to be pretrained in 288 GPU hours, which is 1.2% of the time required to pretrain the highest-performing BERT parametric architectural variant, RoBERTa-large (Liu et al., 2019), and about 33% of that of the world-record, in GPU hours, required to train BERT-large on the same hardware. It is also 7.9x faster on a CPU, as well as being better performing than other compressed variants of the architecture, and some of the non-compressed variants: it obtains performance improvements of between 0.3% and 31%, absolute, with respect to BERT-large, on multiple public natural language understanding (NLU) benchmarks.
+
+This should fix #8135 :hugs: 
+
+---
+
+ToDo tasks:
+
+* [x] Upload models (both PyTorch and TensorFlow model) to model hub
+* [x] Add conversion script from Gluonnlp to Transformers
+* [x] Enable unit tests (they are working and just wait for the model upload)","['new model' 'model training' 'tensorflow or tf' 'examples' 'usage'
+ 'pytorch' 'pipeline' 'tokenization' 'documentation']","[0.99055535 0.89982623 0.68938369 0.59383804 0.58154744 0.57857299
+ 0.54259962 0.40739283 0.14706516]"
+9,[1 0 0 0 0 0 0 0 0],['documentation'],"Fix a broken link in documentation
+
+# What does this PR do?
+
+Fixes a broken link to the BERTology example in documentation
+
+Fixes #9100 
+
+## Before submitting
+- [x] This PR fixes a typo or improves the docs (you can dismiss the other checks if that's the case).
+
+## Who can review?
+
+ documentation: @sgugger 
+","['documentation' 'examples' 'usage' 'new model' 'model training'
+ 'tokenization' 'tensorflow or tf' 'pytorch' 'pipeline']","[9.95265126e-01 6.70183420e-01 3.18614990e-01 1.06441855e-01
+ 3.71843157e-03 8.35950836e-04 8.20416259e-04 7.31742708e-04
+ 6.35018572e-04]"
+10,[1 0 0 0 0 0 0 0 0],['documentation'],"[model_cards] Migrate cards from this repo to model repos on huggingface.co
+
+Fellow reviewers/contributors, please take a look at the documentation part and let me know your thoughts.
+
+---
+#### ⚠️ Still to-do before merging ⚠️ 
+- [x] Post a message on the Forum: https://discuss.huggingface.co/t/announcement-all-model-cards-will-be-migrated-to-hf-co-model-repos/2755
+- [x] Update the buttons on the model pages
+- [x] merge all out-standing model card PRs on the transformers repo
+- [x] the actual migration into the hf.co model repos
+
+ETA: I plan on doing this Thursday (Dec 10) or Friday (Dec 11)!","['documentation' 'usage' 'new model' 'tensorflow or tf' 'pytorch'
+ 'pipeline' 'examples' 'tokenization' 'model training']","[0.98871344 0.72204918 0.67908394 0.49530819 0.37679619 0.34654856
+ 0.34632921 0.28661016 0.12052371]"
+11,[0 0 0 1 0 0 0 0 0],['new model'],"Why BertSelfAttention reshape Q,K,V from 3-D tensor to 4-D tensor
+
+# 🌟 New model addition
+
+## Model description
+https://github.com/huggingface/transformers/blob/master/src/transformers/models/bert/modeling_bert.py
+def transpose_for_scores(self, x):
+        new_x_shape = x.size()[:-1] + (self.num_attention_heads, self.attention_head_size)
+        x = x.view(*new_x_shape)
+        return x.permute(0, 2, 1, 3)
+query_layer = self.transpose_for_scores(mixed_query_layer)
+ key_layer = self.transpose_for_scores(mixed_key_layer)
+ value_layer = self.transpose_for_scores(mixed_value_layer)
+
+## Open source status
+Question:  
+1. Why we must transpose Q,K,V from 3-D tensor to 4-D tensor ?
+2. What if we just use 3-D Q,K,V to do torch.matmul ?
+","['new model' 'pytorch' 'tensorflow or tf' 'documentation' 'examples'
+ 'usage' 'pipeline' 'model training' 'tokenization']","[0.97291201 0.32271656 0.31437278 0.30332685 0.28706008 0.26093817
+ 0.14705609 0.07836333 0.06873471]"
+12,[0 0 0 1 0 0 0 0 0],['new model'],"Why use 'BertLayerNorm'  instead of torch.nn.LayerNorm ?
+
+# 🌟 New model addition
+What's the difference between 'BertLayerNorm' and  torch.nn.LayerNorm
+## Model description  
+1.pytorch    torch.nn.LayerNorm
+https://pytorch.org/docs/stable/generated/torch.nn.LayerNorm.html?highlight=layernorm#torch.nn.LayerNorm
+
+2.modeling.py
+class BertLayerNorm(Module):
+    def __init__(self, hidden_size, eps=1e-12):
+        super(BertLayerNorm, self).__init__()
+        self.shape = torch.Size((hidden_size,))
+        self.eps = eps
+        self.weight = nn.Parameter(torch.ones(hidden_size))
+        self.bias = nn.Parameter(torch.zeros(hidden_size))
+        self.apex_enabled = APEX_IS_AVAILABLE
+             
+    @torch.jit.unused
+    def fused_layer_norm(self, x):
+        return FusedLayerNormAffineFunction.apply(
+                    x, self.weight, self.bias, self.shape, self.eps)
+             
+             
+    def forward(self, x):
+        if self.apex_enabled and not torch.jit.is_scripting():
+            x = self.fused_layer_norm(x)                            
+        else:
+            u = x.mean(-1, keepdim=True)
+            s = (x - u).pow(2).mean(-1, keepdim=True)
+            x = (x - u) / torch.sqrt(s + self.eps)
+            x = self.weight * x + self.bias
+        return x
+
+
+<!-- Important information -->
+It seems like torch.nn.LayerNorm has the same function of  belows ops in BertLayerNorm
+ u = x.mean(-1, keepdim=True)
+ s = (x - u).pow(2).mean(-1, keepdim=True)
+ x = (x - u) / torch.sqrt(s + self.eps)
+ x = self.weight * x + self.bias
+
+Why we don't use  torch.nn.LayerNorm ?
+
+Thanks a lot for answering my question
+
+
+## Open source status
+
+* [ ] the model implementation is available: (give details)
+* [ ] the model weights are available: (give details)
+* [ ] who are the authors: (mention them, if possible by @gh-username)
+","['new model' 'pytorch' 'documentation' 'usage' 'examples' 'tokenization'
+ 'model training' 'tensorflow or tf' 'pipeline']","[0.87769628 0.6436922  0.56328565 0.51154071 0.46305829 0.45919231
+ 0.41474178 0.38733515 0.38200098]"
+13,[0 0 0 1 0 0 0 0 0],['new model'],"Add a new model ConvBert
+
+# 🌟 New model addition
+
+Pre-trained language models like BERT and its variants have recently achieved impressive performance in various natural language understanding tasks. However, BERT heavily relies on the global self-attention block and thus suffers large memory footprint and computation cost. Although all its attention heads query on the whole input sequence for generating the attention map from a global perspective, we observe some heads only need to learn local dependencies, which means the existence of computation redundancy. We therefore propose a novel span-based dynamic convolution to replace these self-attention heads to directly model local dependencies. The novel convolution heads, together with the rest self-attention heads, form a new mixed attention block that is more efficient at both global and local context learning. We equip BERT with this mixed attention design and build a ConvBERT model. Experiments have shown that ConvBERT significantly outperforms BERT and its variants in various downstream tasks, with lower training cost and fewer model parameters. Remarkably, ConvBERTbase model achieves 86.4 GLUE score, 0.7 higher than ELECTRAbase, while using less than 1/4 training cost.
+
+<!-- Important information -->
+
+## Open source status
+
+* [x] the model implementation is available: (https://github.com/yitu-opensource/ConvBert)
+* [x] the model weights are available: (https://drive.google.com/drive/folders/1pSsPcQrGXyt1FB45clALUQf-WTNAbUQa)
+* [x] who are the authors: (@zihangJiang @zhoudaquan)
+","['new model' 'model training' 'usage' 'examples' 'documentation'
+ 'pipeline' 'tensorflow or tf' 'pytorch' 'tokenization']","[0.99823999 0.82981223 0.75003499 0.71261096 0.66523969 0.37021974
+ 0.33973524 0.25536394 0.20830978]"
+14,[0 0 0 1 0 0 0 0 0],['new model'],"Contributing trained Greek<->English NMT models implemented with fairseq
+
+Hi there, quick question that I couldn't answer by searching the docs:
+
+I trained an EL-EN (Greek to English) and an EN-EL machine translation model using the fairseq implementation of the `transformer_iwslt_de_en `architecture on ~6GB of parallel corpora. Given that the models report a better BLEU score compared to the existing SotA, I would like to share them somehow. I thought that fairseq might offer a huggingface-like way to upload trained models but I couldn't find any, so I would appreciate any guidance.
+
+If there's a straightforward way to convert and upload these as huggingface models it would be great!
+
+Many thanks!","['model training' 'usage' 'new model' 'examples' 'pipeline' 'pytorch'
+ 'documentation' 'tensorflow or tf' 'tokenization']","[0.99327445 0.67982614 0.45968568 0.4079321  0.37196612 0.21099752
+ 0.20809759 0.13697644 0.02107028]"
+15,[0 0 0 1 0 0 0 0 0],['new model'],"Add m2m 100 multilingual translation model from FAIR
+
+Weights, code are available.
+
++ Fairseq Code: https://github.com/pytorch/fairseq/tree/master/examples/m2m_100?fbclid=IwAR304kICXsffdDMogK4MWf4D7Xeu_3Cbmgu8pBCU_jKcjijCuJfLK7CY9_I
++ Paper: https://arxiv.org/abs/2010.11125
+
++ This model will not run on 1 V100 GPU, so model parallelism will be needed. 
++ I would expect the state dict to be very similar to mBART, but not sure yet.
++ All I've done is download the state dict, run their command, and asked for help https://github.com/pytorch/fairseq/issues/2772#issuecomment-716152453 when it broke.
+
+
+Leaving this unassigned in case somebody else wants to take over.
+
+","['examples' 'new model' 'pytorch' 'usage' 'pipeline' 'documentation'
+ 'model training' 'tensorflow or tf' 'tokenization']","[0.58673197 0.46195543 0.3765015  0.11883541 0.05582655 0.04037153
+ 0.03037519 0.01944135 0.0078935 ]"
+16,[0 0 0 1 0 0 0 0 0],['new model'],"Sharing Microsoft's DialogRPT (new dialog ranking model)
+
+# 🌟 New model addition
+
+## Model description
+
+Thanks for the awesome work!
+
+[DialogRPT](https://github.com/golsun/DialogRPT) (Dialog Ranking Pretrained Transformers) is a set of GPT-2 based dialogue ranking models recently released with an [EMNLP paper](https://arxiv.org/abs/2009.06978) by Microsoft Research. It's a follow-up work of [DialoGPT](https://huggingface.co/transformers/model_doc/dialogpt.html) (thanks for hosting it!)
+The architecture is pretty simple: a `GPT2Model` followed by a `torch.nn.Linear(n_embd, 1, bias=False)`, and implemented based on a [previous HuggingFace commit](https://github.com/huggingface/transformers/commit/4d456542e9d381090f9a00b2bcc5a4cb07f6f3f7)
+At first, I'm trying to create a model card for it, but then realized that it seems there's no existing model architecture in HuggingFace is compatible with DialogRPT. I noticed a lot of BERT-based sequence classification models, but ours is GPT-2 based. 
+
+If there's a simple fix (or I missed something) please let me know!
+If implementation in modeling_gpt2.py is necessary, I'm also glad to help!
+
+## Open source status
+
+* [x] the model implementation is available: (https://github.com/golsun/DialogRPT)
+* [x] the model weights are available: (https://github.com/golsun/DialogRPT)
+* [x] who are the authors: @golsun @dreasysnail
+","['new model' 'pytorch' 'usage' 'pipeline' 'examples' 'documentation'
+ 'tensorflow or tf' 'model training' 'tokenization']","[0.92510456 0.70762026 0.41203472 0.35846949 0.23617496 0.17681192
+ 0.16087672 0.12871671 0.0414166 ]"
+17,[0 0 0 0 0 0 1 0 0],['tensorflow or tf'],"Cannot import transformers with TF version 2.1.0
+
+The installation README says that transformers library requires Tensorflow version >2.0, but I can't seem to import the latest transformers 3.2 release even with Tensorflow v2.1. 
+
+```
+>>> import transformers
+wandb: WARNING W&B installed but not logged in.  Run `wandb login` or set the WANDB_API_KEY env variable.
+Traceback (most recent call last):
+  File ""<stdin>"", line 1, in <module>
+  File ""/Users/amog/dev/ray/lib/python3.7/site-packages/transformers/__init__.py"", line 121, in <module>
+    from .pipelines import (
+  File ""/Users/amog/dev/ray/lib/python3.7/site-packages/transformers/pipelines.py"", line 47, in <module>
+    from .modeling_tf_auto import (
+  File ""/Users/amog/dev/ray/lib/python3.7/site-packages/transformers/modeling_tf_auto.py"", line 45, in <module>
+    from .modeling_tf_albert import (
+  File ""/Users/amog/dev/ray/lib/python3.7/site-packages/transformers/modeling_tf_albert.py"", line 24, in <module>
+    from .activations_tf import get_tf_activation
+  File ""/Users/amog/dev/ray/lib/python3.7/site-packages/transformers/activations_tf.py"", line 53, in <module>
+    ""swish"": tf.keras.activations.swish,
+AttributeError: module 'tensorflow_core.python.keras.api._v2.keras.activations' has no attribute 'swish'
+```
+
+Upgrading to TF 2.2 works fine, but I think this should be made more clear in the docs.
+
+cc @jplu @sgugger 
+## Environment info
+<!-- You can run the command `transformers-cli env` and copy-and-paste its output below.
+     Don't forget to fill out the missing fields in that output! -->
+     
+- `transformers` version: 3.2.0
+- Platform: Mac OS
+- Python version: 3.7.7
+- PyTorch version (GPU?):
+- Tensorflow version (GPU?): 2.1.0. On CPU only.
+- Using GPU in script?:
+- Using distributed or parallel set-up in script?:
+
+### Who can help
+<!-- Your issue will be replied to more quickly if you can figure out the right person to tag with @
+ If you know how to use git blame, that is the easiest way, otherwise, here is a rough guide of **who to tag**.
+ Please tag fewer than 3 people.
+ 
+ albert, bert, GPT2, XLM: @LysandreJik 
+ tokenizers: @mfuntowicz
+ Trainer: @sgugger
+ Speed and Memory Benchmarks: @patrickvonplaten
+ Model Cards: @julien-c
+ Translation: @sshleifer
+ Summarization: @sshleifer
+ TextGeneration: @TevenLeScao 
+ examples/distillation: @VictorSanh
+ nlp datasets: [different repo](https://github.com/huggingface/nlp)
+ rust tokenizers: [different repo](https://github.com/huggingface/tokenizers)
+ Text Generation: @TevenLeScao
+ blenderbot: @mariamabarham
+ Bart: @sshleifer
+ Marian: @sshleifer
+ T5: @patrickvonplaten
+ Longformer/Reformer: @patrickvonplaten
+ TransfoXL/XLNet: @TevenLeScao 
+ examples/seq2seq: @sshleifer
+ examples/bert-loses-patience: @JetRunner
+ tensorflow: @jplu
+ examples/token-classification: @stefan-it
+ documentation: @sgugger
+ -->
+
+## Information
+
+Model I am using (Bert, XLNet ...):
+
+The problem arises when using:
+* [ ] the official example scripts: (give details below)
+* [ ] my own modified scripts: (give details below)
+
+The tasks I am working on is:
+* [ ] an official GLUE/SQUaD task: (give the name)
+* [ ] my own task or dataset: (give details below)
+
+## To reproduce
+
+Steps to reproduce the behavior:
+
+1.
+2.
+3.
+
+<!-- If you have code snippets, error messages, stack traces please provide them here as well.
+     Important! Use code tags to correctly format your code. See https://help.github.com/en/github/writing-on-github/creating-and-highlighting-code-blocks#syntax-highlighting
+     Do not use screenshots, as they are hard to read and (more importantly) don't allow others to copy-and-paste your code.-->
+
+## Expected behavior
+
+<!-- A clear and concise description of what you would expect to happen. -->
+","['documentation' 'tokenization' 'model training' 'tensorflow or tf'
+ 'pytorch' 'examples' 'pipeline' 'usage' 'new model']","[0.65694541 0.63874334 0.60132021 0.579135   0.57192641 0.55272543
+ 0.54192322 0.44190738 0.29955098]"
+18,[0 0 0 0 0 0 0 1 0],['tokenization'],"PegasusTokenizer: Newline symbol
+
+Ported models generate the `<n>` token at the beginning of sentences, whereas ours do not. The pegasus [original code](https://github.com/google-research/pegasus/blob/master/pegasus/ops/public_parsing_ops.py#L40) replaces `\n` newline symbol with `<n>`. `PegasusTokenizer` should probably do this. 
+
+```python
+_NEWLINE_SYMBOL = ""<n>""
+text = tf.strings.regex_replace(text, ""\n"", _NEWLINE_SYMBOL)
+```
+
+","['tokenization' 'pipeline' 'usage' 'examples' 'new model' 'pytorch'
+ 'tensorflow or tf' 'documentation' 'model training']","[0.93441504 0.5894857  0.5420903  0.31254169 0.25696024 0.22926264
+ 0.16791524 0.07702158 0.05806766]"
+19,[0 0 0 1 0 0 0 0 0],['new model'],"How to implement LayoutLM for information extraction
+
+Hi,
+I am new to nlp
+Can someone please guide me on How to implement the layoutLM using transformers for information extraction (from images like receipt)
+
+from transformers import AutoTokenizer, AutoModel
+tokenizer = AutoTokenizer.from_pretrained(""microsoft/layoutlm-large-uncased"")
+model = AutoModel.from_pretrained(""microsoft/layoutlm-large-uncased"")
+
+","['new model' 'tokenization' 'pytorch' 'pipeline' 'usage' 'model training'
+ 'documentation' 'examples' 'tensorflow or tf']","[0.95296091 0.72386998 0.51651597 0.4733178  0.35855463 0.23655838
+ 0.0975647  0.0920285  0.03989173]"
+20,[0 1 0 0 0 0 0 0 0],['examples'],"DistributedSortishSampler
+
+In examples/seq2seq/finetune.py, 
+`--sortish_sampler  --gpus 2` will raise an assertion error, but if you remove the assert, it will raise another error.   Ideally we should make a Seq2SeqDataset.get_distributed_sortish_sampler method and use it in the relevant case.
+
+","['examples' 'usage' 'pipeline' 'documentation' 'new model'
+ 'model training' 'tensorflow or tf' 'tokenization' 'pytorch']","[0.92037475 0.46516272 0.23520313 0.22882162 0.22618176 0.04287132
+ 0.03588427 0.01960679 0.01077555]"
+21,[0 0 0 1 0 0 0 0 0],['new model'],"Add Language Agnostic Bert Sentence Embedding
+
+# 🌟 New model addition
+
+## Model description
+Google released a new model LaBSe, which is a Language agnostic Bert sentence embedding with 109 language support. 
+
+https://ai.googleblog.com/2020/08/language-agnostic-bert-sentence.html?utm_source=Deep+Learning+Weekly&utm_campaign=cdb8afedb7-EMAIL_CAMPAIGN_2019_04_24_03_18_COPY_01&utm_medium=email&utm_term=0_384567b42d-cdb8afedb7-72940109
+
+The model is also hosted on tfhub as well:https://tfhub.dev/google/LaBSE/1
+
+<!-- Important information -->
+
+## Open source status
+
+* [ ] the model implementation is available: (https://arxiv.org/abs/2007.01852)
+* [ ] the model weights are available: https://tfhub.dev/google/LaBSE/1
+* [ ] who are the authors: (mention them, if possible by @gh-username)
+","['new model' 'documentation' 'tensorflow or tf' 'usage' 'pipeline'
+ 'examples' 'model training' 'pytorch' 'tokenization']","[0.99675179 0.71265942 0.59963471 0.46007368 0.4193342  0.34006751
+ 0.26861531 0.19026981 0.10346515]"
+22,[0 1 0 0 0 0 1 0 0],['examples' 'tensorflow or tf'],"WNUT17 TF example stuck at first epoch 
+
+## Environment info
+<!-- You can run the command `transformers-cli env` and copy-and-paste its output below.
+     Don't forget to fill out the missing fields in that output! -->
+     
+- `transformers` version: 3.0.2
+- Platform: Linux Ubuntu 16.04
+- Python version: 3.6.9
+- PyTorch version (GPU?): /
+- Tensorflow version (GPU?): 2.2.0
+- Using GPU in script?: yes
+- Using distributed or parallel set-up in script?: not that I know
+
+### Who can help
+<!-- Your issue will be replied to more quickly if you can figure out the right person to tag with @
+ If you know how to use git blame, that is the easiest way, otherwise, here is a rough guide of **who to tag**.
+ Please tag fewer than 3 people.
+ 
+ albert, bert, GPT2, XLM: @LysandreJik 
+ tokenizers: @mfuntowicz
+ Trainer: @sgugger
+ Speed and Memory Benchmarks: @patrickvonplaten
+ Model Cards: @julien-c
+ Translation: @sshleifer
+ Summarization: @sshleifer
+ TextGeneration: @TevenLeScao 
+ examples/distillation: @VictorSanh
+ nlp datasets: [different repo](https://github.com/huggingface/nlp)
+ rust tokenizers: [different repo](https://github.com/huggingface/tokenizers)
+ Text Generation: @TevenLeScao
+ blenderbot: @mariamabarham
+ Bart: @sshleifer
+ Marian: @sshleifer
+ T5: @patrickvonplaten
+ Longformer/Reformer: @patrickvonplaten
+ TransfoXL/XLNet: @TevenLeScao 
+ examples/seq2seq: @sshleifer
+ examples/bert-loses-patience: @JetRunner
+ tensorflow: @jplu 
+ documentation: @sgugger
+ --> @jplu 
+
+## Information
+
+Model I am using (Bert, XLNet ...):
+
+The problem arises when using:
+* [X] the official example scripts: (give details below)
+* [ ] my own modified scripts: (give details below)
+
+The tasks I am working on is:
+* [X, WNUT] an official GLUE/SQUaD task: (give the name)
+* [ ] my own task or dataset: (give details below)
+
+## To reproduce
+```
+
+# Token Classification with W-NUT Emerging Entities
+""""""
+Next we will look at token classification. Rather than classifying an entire sequence, this task classifies token by
+token. We'll demonstrate how to do this with 
+[Named Entity Recognition](http://nlpprogress.com/english/named_entity_recognition.html), which involves
+identifying tokens which correspond to a predefined set of ""entities"". Specifically, we'll use the
+[W-NUT Emerging and Rare entities](http://noisy-text.github.io/2017/emerging-rare-entities.html) corpus. The data
+is given as a collection of pre-tokenized documents where each token is assigned a tag.
+
+Let's start by downloading the data.
+! wget http://noisy - text.github.io / 2017 / files / wnut17train.conll
+""""""
+
+
+""""""In this case, we'll just download the train set, which is a single text file. Each line of the file contains either
+(1) a word and tag separated by a tab, or (2) a blank line indicating the end of a document. Let's write a
+function to read this in. We'll take in the file path and return `token_docs` which is a list of lists of token
+strings, and `token_tags` which is a list of lists of tag strings.
+""""""
+
+from pathlib import Path
+import re
+import numpy as np
+from sklearn.model_selection import train_test_split
+import tensorflow as tf
+from transformers import BertTokenizer, TFBertModel, BertConfig
+from transformers import DistilBertTokenizerFast
+from transformers import TFDistilBertForTokenClassification
+from tensorflow.keras.layers import Input, Dense, Activation, Dropout, LSTM, GlobalMaxPool1D
+from tensorflow.keras.models import Model
+from tensorflow.keras.utils import to_categorical
+from tensorflow.keras.preprocessing.sequence import pad_sequences
+
+
+def read_wnut(file_path):
+    file_path = Path(file_path)
+
+    raw_text = file_path.read_text().strip()
+    raw_docs = re.split(r'\n\t?\n', raw_text)
+    token_docs = []
+    tag_docs = []
+    for doc in raw_docs:
+        tokens = []
+        tags = []
+        for line in doc.split('\n'):
+            token, tag = line.split('\t')
+            tokens.append(token)
+            tags.append(tag)
+        token_docs.append(tokens)
+        tag_docs.append(tags)
+
+    return token_docs, tag_docs
+
+texts, tags = read_wnut('wnut17train.conll')
+
+""""""Just to see what this data looks like, let's take a look at a segment of the first document.""""""
+
+print(texts[0][10:17], tags[0][10:17], sep='\n')
+
+""""""`location` is an entity type, `B-` indicates the beginning of an entity, and `I-` indicates consecutive positions of
+the same entity (""Empire State Building"" is considered one entity). `O` indicates the token does not correspond to
+any entity.
+
+Now that we've read the data in, let's create a train/validation split:
+""""""
+
+train_texts, val_texts, train_tags, val_tags = train_test_split(texts, tags, test_size=.2)
+
+""""""Next, let's create encodings for our tokens and tags. For the tags, we can start by just create a simple mapping
+which we'll use in a moment:
+""""""
+
+unique_tags = set(tag for doc in tags for tag in doc)
+tag2id = {tag: id for id, tag in enumerate(unique_tags)}
+id2tag = {id: tag for tag, id in tag2id.items()}
+
+""""""To encode the tokens, we'll use a pre-trained DistilBert tokenizer. We can tell the tokenizer that we're dealing
+with ready-split tokens rather than full sentence strings by passing `is_pretokenized=True`. We'll also pass
+`padding=True` and `truncation=True` to pad the sequences to be the same length. Lastly, we can tell the model
+to return information about the tokens which are split by the wordpiece tokenization process, which we will need in
+a moment.
+""""""
+
+tokenizer = DistilBertTokenizerFast.from_pretrained('distilbert-base-cased')
+train_encodings = tokenizer(train_texts, is_pretokenized=True, return_offsets_mapping=True, padding=True, truncation=True)
+val_encodings = tokenizer(val_texts, is_pretokenized=True, return_offsets_mapping=True, padding=True, truncation=True)
+
+""""""Great, so now our tokens are nicely encoded in the format that they need to be in to feed them into our DistilBert
+model below.
+
+Now we arrive at a common obstacle with using pre-trained models for token-level classification: many of the tokens
+in the W-NUT corpus are not in DistilBert's vocabulary. Bert and many models like it use a method called WordPiece
+Tokenization, meaning that single words are split into multiple tokens such that each token is likely to be in
+the vocabulary. For example, DistilBert's tokenizer would split the Twitter handle `@huggingface` into the tokens
+`['@', 'hugging', '##face']`. This is a problem for us because we have exactly one tag per token. If the tokenizer
+splits a token into multiple sub-tokens, then we will end up with a mismatch between our tokens and our labels.
+
+One way to handle this is to only train on the tag labels for the first subtoken of a split token. We can do this in
+🤗 Transformers by setting the labels we wish to ignore to `-100`. In the example above, if the label for
+`@HuggingFace` is `3` (indexing `B-corporation`), we would set the labels of `['@', 'hugging', '##face']` to
+`[3, -100, -100]`.
+
+Let's write a function to do this. This is where we will use the `offset_mapping` from the tokenizer as mentioned
+above. For each sub-token returned by the tokenizer, the offset mapping gives us a tuple indicating the sub-token's
+start position and end position relative to the original token it was split from. That means that if the first
+position in the tuple is anything other than `0`, we will set its corresponding label to `-100`. While we're at
+it, we can also set labels to `-100` if the second position of the offset mapping is `0`, since this means it must
+be a special token like `[PAD]` or `[CLS]`.
+
+> **NOTE:** Due to a recently fixed bug, -1 must be used instead of -100 when using TensorFlow in 🤗 Transformers <= 3.02.
+""""""
+
+
+def encode_tags(tags, encodings):
+    labels = [[tag2id[tag] for tag in doc] for doc in tags]
+    encoded_labels = []
+    for doc_labels, doc_offset in zip(labels, encodings.offset_mapping):
+        # create an empty array of -100
+        doc_enc_labels = np.ones(len(doc_offset), dtype=int) * -1  # 00
+        arr_offset = np.array(doc_offset)
+
+        # set labels whose first offset position is 0 and the second is not 0
+        doc_enc_labels[(arr_offset[:, 0] == 0) & (arr_offset[:, 1] != 0)] = doc_labels
+        encoded_labels.append(doc_enc_labels.tolist())
+
+    return encoded_labels
+
+train_labels = encode_tags(train_tags, train_encodings)
+val_labels = encode_tags(val_tags, val_encodings)
+
+train_encodings.pop(""offset_mapping"")  # we don't want to pass this to the model
+val_encodings.pop(""offset_mapping"")
+
+train_dataset = tf.data.Dataset.from_tensor_slices((
+    dict(train_encodings),
+    train_labels
+))
+val_dataset = tf.data.Dataset.from_tensor_slices((
+    dict(val_encodings),
+    val_labels
+))
+
+""""""Now load in a token classification model and specify the number of labels:""""""
+
+model = TFDistilBertForTokenClassification.from_pretrained('distilbert-base-cased', num_labels=len(unique_tags))
+
+optimizer = tf.keras.optimizers.Adam(learning_rate=5e-5)
+model.compile(optimizer=optimizer, loss=model.compute_loss, metrics=[""accuracy""])  # can also use any keras loss fn
+model.fit(train_dataset.shuffle(1000).batch(16), epochs=3, batch_size=16, verbose=3)
+```
+
+## Expected behavior
+the example runs and does not get stuck at the first epoch :) ","['tokenization' 'examples' 'documentation' 'usage' 'pytorch'
+ 'model training' 'tensorflow or tf' 'new model' 'pipeline']","[0.90066701 0.85649502 0.84054846 0.82503939 0.80346018 0.79995447
+ 0.7538138  0.60218078 0.58691388]"
+23,[0 0 0 1 0 0 0 0 0],['new model'],"Open-Retrieval Question Answering (ORQA)
+
+# 🌟 New model addition
+
+Open-Retrieval Question Answering system (ORQA) was introduced in the paper https://arxiv.org/abs/1906.00300. This approach is very useful for those who work on Open Domain Question Answering.
+
+<!-- Important information -->
+
+## Open source status
+
+* [x] the model implementation is available: All the implementation code has been released in https://github.com/google-research/language/tree/master/language/orqa
+* [x] the model weights are available: `gs://orqa-data/`
+* [x] who are the authors: @kentonl et al. ","['new model' 'usage' 'pipeline' 'tensorflow or tf' 'examples'
+ 'documentation' 'model training' 'pytorch' 'tokenization']","[0.99860805 0.56486452 0.31441152 0.27320117 0.25466084 0.25428298
+ 0.24817014 0.24436556 0.0677022 ]"
+24,[0 0 0 0 0 0 0 1 0],['tokenization'],"MBartTokenizerTrimmed to support truncated embeddings
+
+Motivation:
+The embeddings table for MBART is huge, but only ~40K of the entries are used/finetuned for most wmt tasks. See https://github.com/pytorch/fairseq/issues/2120 
+
+- needs vocab.json (fairseq Dictionary)
+- needs to call `encode_as_pieces` with restricted vocabulary.
+
+I will take this.","['pytorch' 'tokenization' 'new model' 'usage' 'pipeline' 'documentation'
+ 'examples' 'tensorflow or tf' 'model training']","[0.93097419 0.88543731 0.72819412 0.67023039 0.4680315  0.26360691
+ 0.22631118 0.11454075 0.07878447]"
+25,[0 0 0 1 0 0 0 0 0],['new model'],"🌟 BigBird
+
+# 🌟 New model addition
+
+## Model description
+
+Paper : https://arxiv.org/pdf/2007.14062.pdf
+
+Abstract : 
+> Transformers-based models, such as BERT, have been one of the most successful deep learning
+models for NLP. Unfortunately, one of their core limitations is the quadratic dependency
+(mainly in terms of memory) on the sequence length due to their full attention mechanism.
+To remedy this, we propose, BigBird, a sparse attention mechanism that reduces this
+quadratic dependency to linear. We show that BigBird is a universal approximator of
+sequence functions and is Turing complete, thereby preserving these properties of the
+quadratic, full attention model. Along the way, our theoretical analysis reveals some of the
+benefits of having O(1) global tokens (such as CLS), that attend to the entire sequence
+as part of the sparse attention mechanism. The proposed sparse attention can handle
+sequences of length up to 8x of what was previously possible using similar hardware. As
+a consequence of the capability to handle longer context, BigBird drastically improves
+performance on various NLP tasks such as question answering and summarization. We also
+propose novel applications to genomics data.
+
+
+## Open source status
+
+* [ ] the model implementation is available: *No*
+* [ ] the model weights are available: *No*
+* [ ] who are the authors: *?*
+","['new model' 'documentation' 'tokenization' 'usage' 'examples' 'pipeline'
+ 'model training' 'tensorflow or tf' 'pytorch']","[0.99598515 0.94740748 0.72484094 0.53596741 0.52609795 0.4979893
+ 0.38574082 0.21093799 0.20489301]"
+26,[0 0 0 1 0 0 0 0 0],['new model'],"Add Fast Transformers - Transformers are RNNs: Fast Autoregressive Transformers with Linear Attention
+
+# 🌟 New model addition
+
+## Model description
+
+The Fast Transformers repo introduces a fast transformer model based on work to improve attention published in two papers:
+
+- Transformers are RNNs: Fast Autoregressive Transformers with Linear Attention (https://arxiv.org/abs/2006.16236)
+- Fast Transformers with Clustered Attention (https://arxiv.org/abs/2007.04825)
+
+## Open source status
+
+* [X] the model implementation is available: (give details)
+https://github.com/idiap/fast-transformers
+
+* [x] the model weights are available: (give details)
+* [X] who are the authors: (mention them, if possible by @gh-username)
+@angeloskath","['new model' 'documentation' 'usage' 'examples' 'tensorflow or tf'
+ 'pytorch' 'model training' 'pipeline' 'tokenization']","[0.99864751 0.9229731  0.71887922 0.49232846 0.47303161 0.42542601
+ 0.4001224  0.37591389 0.18569253]"
+27,[0 1 0 0 0 0 0 0 0],['examples'],"Faster mBART finetuning
+
+Goal: Get BLEU 20 in 1 epoch on wmt-en-ro.
+Can't run a bs=1 without `--freeze_embeds`.
+1 epoch takes 6H on 16GB GPU with fp16, with `--freeze_embeds` and `--freeze_encoder`. Max bs=4
+
+
+Ideas:
+
+- [ ] Dataset that fits as many sentences as possible into an example, to increase gpu utilization.
+- [ ] Only store embeddings once
+- [ ] prune embeddings: https://github.com/pytorch/fairseq/issues/2120
+- [ ] `label_smoothing=0.1`
+- [ ] TPU?
+
+
+Fairseq finetune command:
+https://github.com/pytorch/fairseq/issues/2179
+","['pytorch' 'examples' 'usage' 'new model' 'pipeline' 'tokenization'
+ 'model training' 'tensorflow or tf' 'documentation']","[0.67412424 0.61398792 0.22554445 0.0978739  0.06195978 0.04399401
+ 0.03307855 0.02991699 0.02777795]"
+28,[1 0 0 0 0 0 0 0 0],['documentation'],"t5 model card
+
+Add Model Card for all t5 checkpoints.
+cc @clmnt ","['usage' 'model training' 'tokenization' 'documentation' 'new model'
+ 'tensorflow or tf' 'pipeline' 'examples' 'pytorch']","[0.49399629 0.44644758 0.38936329 0.38769385 0.36575565 0.31022739
+ 0.29227519 0.23109925 0.18069115]"
+29,[0 0 0 0 0 0 0 1 0],['tokenization'],"WARNING:transformers.tokenization_utils:Keyword arguments {'add_space_before_punct_symbol': True} not recognized.
+
+# 🐛 Bug
+
+## Information
+
+Model I am using (Bert, XLNet ...):
+ctrl
+
+Language I am using the model on (English, Chinese ...):
+English
+The problem arises when using:
+* [ ] the official example scripts: (give details below)
+```
+python run_generation.py \
+    --model_type ctrl \
+    --model_name ctrl --length=100 --temperature 0.2 --num_return_sequences=5 --p=0.8 --seed=17 --repetition_penalty=1.2 
+```
+
+## Expected behavior
+
+<!-- A clear and concise description of what you would expect to happen. -->
+
+## Environment info
+<!-- You can run the command `transformers-cli env` and copy-and-paste its output below.
+     Don't forget to fill out the missing fields in that output! -->
+
+```
+- `transformers` version: 3.0.1
+- Platform: Darwin-19.5.0-x86_64-i386-64bit
+- Python version: 3.7.4
+- PyTorch version (GPU?): 1.2.0 (False)
+- Tensorflow version (GPU?): 2.1.0 (False)
+- Using GPU in script?: no
+- Using distributed or parallel set-up in script?: no
+```","['examples' 'tokenization' 'usage' 'tensorflow or tf' 'pytorch'
+ 'model training' 'pipeline' 'documentation' 'new model']","[0.59749866 0.31925344 0.30205089 0.29958904 0.29143983 0.24469224
+ 0.11454276 0.10555125 0.03868737]"
+30,[0 0 0 0 0 0 0 1 0],['tokenization'],"[ERROR] Tokenizer and TokenizerFast ??? 
+
+# 🐛 Bug
+
+## Information
+
+Model I am using (Bert, XLNet ...): BERT
+
+Language I am using the model on (English, Chinese ...): 'bert-base-multilingual-cased'
+
+The problem arises when using:
+* [ x] the official example scripts: (give details below)
+* [ ] my own modified scripts: (give details below)
+
+The tasks I am working on is:
+* [ ] an official GLUE/SQUaD task: (give the name)
+* [ x] my own task or dataset: (give details below)
+## To reproduce
+
+Steps to reproduce the behavior:
+
+1. `from transformers import *`
+2. `tokenizer = BertTokenizerFast.from_pretrained('bert-base-multilingual-cased')`
+3. `tokenizer.decode(tokenizer.encode('mở bài lạc trôi'))` --> wrong 
+
+
+but:
+
+1. `from transformers import *`
+2. `tokenizer = BertTokenizer.from_pretrained('bert-base-multilingual-cased')`
+3. `tokenizer.decode(tokenizer.encode('mở bài lạc trôi'))` --> true
+
+<!-- If you have code snippets, error messages, stack traces please provide them here as well.
+     Important! Use code tags to correctly format your code. See https://help.github.com/en/github/writing-on-github/creating-and-highlighting-code-blocks#syntax-highlighting
+     Do not use screenshots, as they are hard to read and (more importantly) don't allow others to copy-and-paste your code.-->
+
+## Expected behavior
+the decode sentence after encoding and decoding using TokenizerFast should be true
+<!-- A clear and concise description of what you would expect to happen. -->
+
+## Environment info
+<!-- You can run the command `transformers-cli env` and copy-and-paste its output below.
+     Don't forget to fill out the missing fields in that output! -->
+     
+- `transformers` version:
+- Platform: Pytorch and TF
+- Python version: 3.6
+- PyTorch version (GPU?): GPU
+- Tensorflow version (GPU?): 2.2
+- Using GPU in script?: Yes
+- Using distributed or parallel set-up in script?: No
+","['pytorch' 'tokenization' 'pipeline' 'documentation' 'examples' 'usage'
+ 'tensorflow or tf' 'model training' 'new model']","[0.74765944 0.4829531  0.37848037 0.35200065 0.34589988 0.32983708
+ 0.30451241 0.10444771 0.03262085]"
+31,[0 0 0 0 0 0 1 0 0],['tensorflow or tf'],"Add TFBartForConditionalGeneration
+
+- adds `TFBartForConditionalGeneration`, which can generate summaries that are equivalent to pytorch.
+
+
+#### TODO this PR:
+- [x] fast tests besides two
+- [x] reasonable xsum generations
+- [x] tests passing
+- [x] fix slow cnn test (tf needs to call `adjust_logits_during_generation`)
+- [x] functional dropout
+- [x] simplify torch and tf caching logic
+- [x] docs
+- [x] upload applicable tf/h5 weights.
+
+
+
+#### Future PRs:
+
+- [ ] blender/pegasus/mBART/marian etc.
+- [ ] #7814","['new model' 'pytorch' 'usage' 'documentation' 'examples' 'pipeline'
+ 'model training' 'tokenization' 'tensorflow or tf']","[0.6937921  0.4673537  0.46607494 0.46422967 0.36990368 0.34287962
+ 0.31989473 0.21395467 0.1824342 ]"
+32,[0 0 0 0 0 0 0 1 0],['tokenization'],"tokenizer started throwing this warning, """"Truncation was not explicitely activated but `max_length` is provided a specific value, please use `truncation=True` to explicitely truncate examples to max length. Defaulting to 'only_first' truncation strategy. If you encode pairs of sequences (GLUE-style) with the tokenizer you may want to check this is the right behavior.""""
+
+Recently while experimenting, BertTokenizer start to throw this warning
+```bash
+Truncation was not explicitely activated but `max_length` is provided a specific value, please use `truncation=True` to explicitely truncate examples to max length. Defaulting to 'only_first' truncation strategy. If you encode pairs of sequences (GLUE-style) with the tokenizer you may want to check this is the right behavior.
+```
+I know, this warning asks to provide truncation value.
+I'm asking here because this warning started this morning.","['tokenization' 'examples' 'new model' 'pipeline' 'pytorch'
+ 'tensorflow or tf' 'usage' 'model training' 'documentation']","[0.86078775 0.83933711 0.56689548 0.45456955 0.45130542 0.44665655
+ 0.44365773 0.20852615 0.17258868]"
+33,[0 0 0 1 0 0 0 0 0],['new model'],"AllenNLP SPECTER model
+
+# 🌟 New model addition
+
+SPECTER: Document-level Representation Learning using Citation-informed Transformers
+
+## Model description
+
+[SPECTER](https://arxiv.org/pdf/2004.07180.pdf) by AllenAI is a new method to generate document-level embedding of scientific documents based on pretraining a Transformer language model on a powerful signal of document-level relatedness: the citation graph. It is based on SciBERT.
+
+This model is showing us promising results for scientific paper similarity tasks. However, the repo is quite rough around the edges and inference performance could be better. According to the AllenNLP repo issues, they do not plan to adapt the models to ONNX runtime.
+
+It would be great to have a plug'n'play implementation for Transformers. Instructions on how to do this are also welcome 🤝 
+
+## Open source status
+
+* [x] the model implementation is available: https://github.com/allenai/specter 
+* [x] the model weights are available: see repo above 
+* [x] who are the authors: AllenAI, @armancohan, @sergeyf 
+","['new model' 'documentation' 'model training' 'examples' 'usage'
+ 'pipeline' 'pytorch' 'tensorflow or tf' 'tokenization']","[0.9967227  0.66711962 0.5366255  0.39955017 0.34791708 0.32561958
+ 0.28536767 0.16936088 0.05418807]"
+34,[0 0 0 0 0 0 0 1 0],['tokenization'],"run_squad.py :: ValueError: Input [] is not valid. Should be a string, a list/tuple of strings or a list/tuple of integers.
+
+# 🐛 Bug
+
+## Information
+
+Model I am using (Bert, XLNet ...): Bert
+
+Language I am using the model on (English, Chinese ...): English
+
+The problem arises when using:
+[*] the official example scripts: (give details below)
+[ ] my own modified scripts: (give details below)
+
+The tasks I am working on is:
+[*] an official GLUE/SQUaD task: (give the name)
+[ ] my own task or dataset: (give details below)
+
+## To reproduce
+
+Steps to reproduce the behavior:
+
+1. while running run_squad.py 
+2.  Training & testing with
+https://rajpurkar.github.io/SQuAD-explorer/dataset/train-v1.1.json
+https://rajpurkar.github.io/SQuAD-explorer/dataset/dev-v1.1.json
+
+
+<!-- If you have code snippets, error messages, stack traces please provide them here as well.
+     Important! Use code tags to correctly format your code. See https://help.github.com/en/github/writing-on-github/creating-and-highlighting-code-blocks#syntax-highlighting
+     Do not use screenshots, as they are hard to read and (more importantly) don't allow others to copy-and-paste your code.-->
+
+## Error
+  File ""/usr/lib/python3.6/multiprocessing/pool.py"", line 320, in <genexpr>
+    return (item for chunk in result for item in chunk)
+  File ""/usr/lib/python3.6/multiprocessing/pool.py"", line 735, in next
+    raise value
+ValueError: Input [] is not valid. Should be a string, a list/tuple of strings or a list/tuple of integers.
+
+
+## Expected behavior
+
+To work
+
+## Environment info
+- `transformers` version: 2.11.0
+- Platform: Linux-5.3.0-1017-aws-x86_64-with-Ubuntu-18.04-bionic
+- Python version: 3.6.9
+- PyTorch version (GPU?): 1.5.1 (False)
+- Tensorflow version (GPU?): 2.2.0 (False)
+- Using GPU in script?: No
+- Using distributed or parallel set-up in script?: No
+
+","['pytorch' 'pipeline' 'model training' 'tensorflow or tf' 'examples'
+ 'documentation' 'usage' 'tokenization' 'new model']","[0.85194635 0.82070976 0.77398741 0.49867809 0.47011623 0.41355518
+ 0.41021186 0.27034119 0.08247657]"
+35,[0 0 0 0 1 0 0 0 0],['pipeline'],"[pipelines] Change summarization default to distilbart-cnn-12-6
+
+- Also adds an integration test that runs on GPU if available.
+- Other pipelines could do the same if that would be helpful.","['pipeline' 'new model' 'usage' 'pytorch' 'examples' 'model training'
+ 'tensorflow or tf' 'documentation' 'tokenization']","[0.95919317 0.85837543 0.47750726 0.26251495 0.19172917 0.12497157
+ 0.12230793 0.08351617 0.01523836]"
+36,[0 0 0 0 0 0 0 1 0],['tokenization'],"BertTokenizerFast does not support `pad_to_max_length` argument
+
+# 🐛 Bug
+
+The fast tokenizer has different behavior from the normal tokenizer.
+
+```python
+from transformers import BertTokenizer, BertTokenizerFast
+
+BertTokenizer.from_pretrained(""bert-base-uncased"").encode(""hello world"", max_length=128, pad_to_max_length=""right"")
+# succeeds
+BertTokenizerFast.from_pretrained(""bert-base-uncased"").encode(""hello world"", max_length=128, pad_to_max_length=""right"")
+*** TypeError: enable_padding() got an unexpected keyword argument 'max_length'
+```
+
+## Environment info
+     
+- `transformers` version: 2.11.0
+- `tokenizers` version: 0.8.0rc3
+- Platform: Ubuntu 18.04
+- Python version: 3.7
+","['tokenization' 'pytorch' 'usage' 'pipeline' 'examples' 'new model'
+ 'model training' 'tensorflow or tf' 'documentation']","[0.7713573  0.56245977 0.4258548  0.40693864 0.19122097 0.17386694
+ 0.12152461 0.08627016 0.05921555]"
+37,[0 1 0 0 0 0 0 0 0],['examples'],"examples/seq2seq supports translation
+
+- renames `examples/summarization` -> `examples/seq2seq`
+- finetune.py and run_eval.py support mbart, marian and t5.
+- task_specific_params are used
+- if you specify task='translation', then your metric becomes BLEU instead of ROUGE.
+- improved `README.md`
+- lots of test coverage
+- scripts to reproduce distilbart results
+
+TODO:
+- [x] verified distilbart commands replicate posted results.
+- [x] new xsum shared task URL.
+- [x] mini models for marian
+- [x] mbart finetuning unittests.
+
+Postponed and made issues for:
+- [ ] check bleu scores for translation models with run_eval.py
+","['examples' 'usage' 'documentation' 'new model' 'pipeline' 'pytorch'
+ 'tensorflow or tf' 'model training' 'tokenization']","[0.71009076 0.46063149 0.44728786 0.31574452 0.3132661  0.17930119
+ 0.0884125  0.05422699 0.05218045]"
+38,[0 0 0 0 0 0 0 1 0],['tokenization'],"batch_encode_plus() causes OOM, while encode_plus does not 
+
+# ❓ Questions & Help
+
+<!-- The GitHub issue tracker is primarly intended for bugs, feature requests,
+     new models and benchmarks, and migration questions. For all other questions,
+     we direct you to Stack Overflow (SO) where a whole community of PyTorch and
+     Tensorflow enthusiast can help you out. Make sure to tag your question with the
+     right deep learning framework as well as the huggingface-transformers tag: 
+     https://stackoverflow.com/questions/tagged/huggingface-transformers 
+     
+     If your question wasn't answered after a period of time on Stack Overflow, you
+     can always open a question on GitHub. You should then link to the SO question 
+     that you posted.
+     -->
+
+## Details
+<!-- Description of your issue -->
+I am running a sequence classification task using `DistilBertForSequenceClassfication`. I follow `examples/text_classfication/run_glue.py` and `src/transformers/data/processors/glue.py` to implement my data loading process. My dataset is a rather large one (~2.5 GB with 7M+ examples), compared to those of the GLUE tasks. 
+
+In the current `glue.py`, `_glue_convert_examples_to_features()` reads all the examples into a list, and then call `batch_encode_plus()` on that list. On my large dataset, this implementation caused an out-of-memory (OOM) error. Therefore, I switched to `encode_plus()`, and called it on individual data example while looping through the dataset. `encode_plus()` did not cause OOM. 
+
+I wonder if there is something wrong with `batch_encode_plus()` so that it cannot handle all the examples in a dataset at once? If that is the case, it might be a good idea to add a corresponding note to the documentation. 
+
+","['usage' 'examples' 'pytorch' 'documentation' 'tensorflow or tf'
+ 'pipeline' 'new model' 'model training' 'tokenization']","[0.77229494 0.76658976 0.71146625 0.54492843 0.40298012 0.38271785
+ 0.32810238 0.02976834 0.00461715]"
+39,[0 0 0 0 0 0 0 1 0],['tokenization'],"Why doesn't stride in squad_convert_example_to_features‘s encode_plus set to doc_stride?
+
+# ❓ Questions & Help
+
+<!-- The GitHub issue tracker is primarly intended for bugs, feature requests,
+     new models and benchmarks, and migration questions. For all other questions,
+     we direct you to Stack Overflow (SO) where a whole community of PyTorch and
+     Tensorflow enthusiast can help you out. Make sure to tag your question with the
+     right deep learning framework as well as the huggingface-transformers tag: 
+     https://stackoverflow.com/questions/tagged/huggingface-transformers 
+     
+     If your question wasn't answered after a period of time on Stack Overflow, you
+     can always open a question on GitHub. You should then link to the SO question 
+     that you posted.
+     -->
+
+## Details
+<!-- Description of your issue -->
+
+<!-- You should first ask your question on SO, and only if
+     you didn't get an answer ask it here on GitHub. -->
+**A link to original question on Stack Overflow**:
+","['new model' 'pytorch' 'tensorflow or tf' 'documentation' 'usage'
+ 'examples' 'pipeline' 'model training' 'tokenization']","[0.92105556 0.69906873 0.68592912 0.64632523 0.54452294 0.3718411
+ 0.34174612 0.29794288 0.20024216]"
+40,[0 0 0 0 0 0 0 1 0],['tokenization'],"new tokenizer backend breaks old code
+
+# 🐛 Bug
+
+## Information
+
+Model I am using (Bert, XLNet ...): any model
+
+Language I am using the model on (English, Chinese ...): english
+
+The problem arises when using:
+* [x] the official example scripts: (give details below) QA script from official repo
+
+The tasks I am working on is:
+* [x] an official GLUE/SQUaD task: (give the name) Squad 1 and 2
+
+## To reproduce
+
+Steps to reproduce the behavior:
+
+Just try to run the example script for QA task
+
+The error output is too large to copy in here.
+The new tokenizer backend is not backward compatible. The truncation is set to false by default. 
+With the new tokenizer backend the truncation need to get initialized with True value, but in example or old codes there is often no possibility to set it while calling.
+I think the feature conversion code is not updated to the new backend, right ?
+
+## Expected behavior
+It should train the model correctly
+
+## Environment info
+<!-- You can run the command `transformers-cli env` and copy-and-paste its output below.
+     Don't forget to fill out the missing fields in that output! -->
+     
+- `transformers` version:
+- Platform: any
+- Python version: 3.7-3.8
+- PyTorch version (GPU?): 
+- Tensorflow version (GPU?):
+- Using GPU in script?: yes
+- Using distributed or parallel set-up in script?: no
+","['model training' 'pytorch' 'examples' 'tensorflow or tf' 'usage'
+ 'tokenization' 'new model' 'pipeline' 'documentation']","[0.92683488 0.71815586 0.65841603 0.55823451 0.54664123 0.54069328
+ 0.36435667 0.34140867 0.06256072]"
+41,[0 0 0 1 0 0 0 0 0],['new model'],"Image GPT
+
+# 🌟 New model addition
+
+## Model description
+
+OpenAI just announced Image GPT: https://openai.com/blog/image-gpt/
+
+Although image rendering would be out of scope for Transformers, the RGB generation would still be in scope and it would be best to port the weights to a `GPT2LMModel`.
+
+However, it's not immediately clear here how the tokenization is implemented in the downloaded model. (no separate `vocab.json`)
+
+## Open source status
+
+* [ ] the model implementation is available: https://github.com/openai/image-gpt
+* [ ] the model weights are available: see README above
+* [ ] who are the authors: @openai
+","['new model' 'tokenization' 'documentation' 'usage' 'pipeline' 'examples'
+ 'tensorflow or tf' 'model training' 'pytorch']","[0.99787015 0.92038924 0.52889162 0.34853745 0.24010287 0.16994439
+ 0.16919279 0.06200724 0.04914191]"
+42,[0 0 0 0 0 0 1 0 0],['tensorflow or tf'],"🐛 TFTrainer not working on TPU (TF2.2)
+
+# 🐛 Bug
+
+## Information
+
+The problem arises when using:
+* [ ] the official example scripts
+* [x] my own modified scripts
+
+The tasks I am working on is:
+* [x] an official GLUE/SQUaD task: CNN/DM
+* [ ] my own task or dataset
+
+## To reproduce
+
+Steps to reproduce the behavior:
+
+1. Install `transformers` from `master`
+2. Run TPU training using `TFTrainer`
+
+I get the following error :
+
+>TypeError: Failed to convert object of type <class 'transformers.optimization_tf.AdamWeightDecay'> to Tensor. Contents: <transformers.optimization_tf.AdamWeightDecay object at 0x7faddc7cfe80>. Consider casting elements to a supported type.
+
+---
+
+Here :
+https://github.com/huggingface/transformers/blob/9931f817b75ecb2c8bb08b6e9d4cbec4b0933935/src/transformers/trainer_tf.py#L324
+
+we pass `optimizer` as arguments.
+
+But according to the documentation in TF :
+https://github.com/tensorflow/tensorflow/blob/2b96f3662bd776e277f86997659e61046b56c315/tensorflow/python/distribute/distribute_lib.py#L890-L891
+
+>All arguments in `args` or `kwargs` should either be nest of tensors or
+    `tf.distribute.DistributedValues` containing tensors or composite tensors.
+
+## Environment info
+     
+- `transformers` version: 2.11.0
+- Platform: Linux-4.9.0-9-amd64-x86_64-with-debian-9.12
+- Python version: 3.6.9
+- PyTorch version (GPU?): 1.5.0 (False)
+- Tensorflow version (GPU?): 2.2.0 (False)
+- Using GPU in script?: No
+- Using distributed or parallel set-up in script?: TPU training
+","['tensorflow or tf' 'model training' 'examples' 'usage' 'pipeline'
+ 'documentation' 'pytorch' 'tokenization' 'new model']","[0.72905201 0.31371328 0.29295045 0.25058752 0.22208016 0.19461681
+ 0.1283724  0.11354172 0.0804354 ]"
+43,[0 1 0 0 0 0 0 0 0],['examples'],"[examples] SummarizationModule improvements
+
+This PR makes the SummarizationTrainer much more usable, and when improvements are not unique to summarization, they are implemented in `lightning_base.py` instead.
+
+- **Checkpointing** Before this PR, the code saves 5GB of PL checkpoints per epoch, now SummarizationTrainer saves the best checkpoint based on ROUGE 2 score, and also saves it in huggingface `save_pretrained` format using the `on_save_checkpoint`. This will help resolve lots of confusion in various issues about how to load the pl checkpoints.
+
+The current summarization code can only accept bs=1 and takes 24h to run 1 epoch on CNN DM. With the following changes, you can train much faster, if you wish. The docs suggested that larger batch sizes were possible with default params, which is fixed.
+
+### Changes to Allow Faster Summarization Training
+*these are all optional and turned off by default*
+
+
+1) freezing: before this PR, it was basically only possible to finetune with batchsize 2-4 on a 16GB system. With `--freeze_embeds` and `--freeze_encoder`, you can get batch size MUCH higher, towards 32. I've seen strong results with these options. 
+
+2) On CNNDM and XSUM the datasets are 200K examples, and epochs are very long. For this reason it is preferable to run validation (and get a rouge score) more frequently, but with previous params each `validation_step` took 1hr. By passing `--n_val=1000 --val_check_interval=0.25`, you can run validation 4x per epoch and it only takes 3 minutes. I also allows the config's beam search parameters to be used, rather than hardcoding faster but lower scoring ones. 
+
+3) `{train|val|test}_max_target_length`: I have found it preferable to truncate train summaries to 56 for XSUM and CNNDM respectively, but doing this for val/test artificially inflates rouge scores. So these clargs are separated.
+
+
+Changes to `lightning_base`
+- Number of trainable parameters and total parameters are logged by default.
+- All possible `pl.Trainer` clargs are passed through `add_generic_args` (Inspired by @nateraw)
+
+
+### WandbLogger
+- `--logger wandb` will instantiate a default wandb logger.
+- `--logger wandb_shared` will post results to [here](https://app.wandb.ai/sshleifer/hf_summarization/table?workspace=user-), so that the community can compare hyperparameter settings empirically.
+- the default logger is still tensorboard logger because it doesn't require making an account.
+
+### Distillation
+- `SummarizationDistiller` and `T5SummarizationDistiller` are checked in. This code was sent to me by a researcher who wishes to remain anonymous. DM to discuss.","['examples' 'usage' 'documentation' 'pipeline' 'pytorch' 'new model'
+ 'model training' 'tokenization' 'tensorflow or tf']","[0.69876432 0.27510029 0.20745632 0.13603877 0.13439487 0.13021839
+ 0.10564759 0.0708496  0.06578251]"
+44,[0 0 0 1 0 0 0 0 0],['new model'],"Pegasus for summarization ! 
+
+# 🌟 New model addition
+
+## Model description
+
+https://ai.googleblog.com/2020/06/pegasus-state-of-art-model-for.html?m=1
+
+https://arxiv.org/abs/1912.08777
+
+Abstract 
+Recent work pre-training Transformers with self-supervised objectives on large text corpora has shown great success when fine-tuned on downstream NLP tasks including text summarization. However, pre-training objectives tailored for abstractive text summarization have not been explored. Furthermore there is a lack of systematic evaluation across diverse domains. In this work, we propose pre-training large Transformer-based encoder-decoder models on massive text corpora with a new self-supervised objective. In PEGASUS, important sentences are removed/masked from an input document and are generated together as one output sequence from the remaining sentences, similar to an extractive summary. We evaluated our best PEGASUS model on 12 downstream summarization tasks spanning news, science, stories, instructions, emails, patents, and legislative bills. Experiments demonstrate it achieves state-of-the-art performance on all 12 downstream datasets measured by ROUGE scores. Our model also shows surprising performance on low-resource summarization, surpassing previous state-of-the-art results on 6 datasets with only 1000 examples. Finally we validated our results using human evaluation and show that our model summaries achieve human performance on multiple datasets. 
+
+## Open source status
+
+* [x] the model implementation is available: https://github.com/google-research/pegasus
+* [x] the model weights are available: https://github.com/google-research/pegasus
+* [x] who are the authors: Jingqing Zhang @JingqingZ, Yao Zhao @yaozhaogoogle, Mohammad Saleh and Peter J. Liu
+","['new model' 'model training' 'usage' 'examples' 'tensorflow or tf'
+ 'pipeline' 'pytorch' 'documentation' 'tokenization']","[0.99336106 0.59356523 0.30457649 0.29635945 0.17574534 0.15597998
+ 0.11291561 0.09238931 0.01985924]"
+45,[0 0 1 0 0 0 0 0 0],['model training'],"Why init specific layers rather than whole model  in BART
+
+In BartForSequenceClassification I can see that rather than calling `self.init_weights()` (which most other models use) only specifically the classification head is initialized.
+
+https://github.com/huggingface/transformers/blob/c58e6c129a153ca1a5021e5d7e642d00bf011e20/src/transformers/modeling_bart.py#L1046-L1047
+
+Is there any advantage of doing this for the head(s) only rather than for the whole model? I can think of a speed improved, but apart from that I'm not sure.
+","['new model' 'usage' 'examples' 'model training' 'documentation'
+ 'pipeline' 'tokenization' 'pytorch' 'tensorflow or tf']","[0.78044879 0.70322347 0.30821851 0.26196873 0.07658424 0.03936867
+ 0.00929113 0.00793954 0.00246681]"
+46,[0 0 0 1 0 0 0 0 0],['new model'],"Compressive Transformer
+
+# 🌟 New model addition
+
+## Model description
+
+<table>
+    <tr><th>Title</th><td>Compressive Transformers for Long-Range Sequence Modelling (ICLR '20)</td></tr>
+    <tr><th>arXiv</th><td><a href=""https://arxiv.org/pdf/1911.05507.pdf"">1911.05507</a></td></tr>
+    <tr><th>Blog</th><td><a href=""https://deepmind.com/blog/article/A_new_model_and_dataset_for_long-range_memory"">A new model and dataset for long-range memory</a></td></tr>
+</table>
+
+__Compressive Transformer__ is an attentive sequence model which __compresses past memories__ for long-range sequence learning. The idea is similar to [Transformer-XL](https://arxiv.org/pdf/1901.02860.pdf). However, the memories are compressed in __Compressive Transformer__, making it leverage longer past memories compared to __Transformer-XL__.
+
+## Open source status
+
+- [ ] the model implementation is available
+- [ ] the model weights are available
+- [ ] who are the authors","['new model' 'documentation' 'pytorch' 'usage' 'pipeline' 'model training'
+ 'examples' 'tensorflow or tf' 'tokenization']","[0.99818295 0.83229709 0.6359669  0.59809101 0.44111741 0.44016933
+ 0.43321049 0.3367705  0.28062853]"
+47,[1 0 0 0 0 0 0 0 0],['documentation'],"AutoModel.from_config loads random parameter values.
+
+# 🐛 Bug
+
+## Information
+
+Model I am using (Bert, XLNet ...): Bert
+
+Language I am using the model on (English, Chinese ...): English
+
+The problem arises when using:
+* [ ] the official example scripts: (give details below)
+* [x] my own modified scripts: (give details below)
+Model parameters are (apparently) random initialized when using `AutoModel.from_config`.
+
+The tasks I am working on is:
+* [ ] an official GLUE/SQUaD task: (give the name)
+* [x] my own task or dataset: (give details below)
+
+## To reproduce
+
+Steps to reproduce the behavior:
+
+1. `git clone https://github.com/gkutiel/transformers-bug`
+2. `cd transformers-bug`
+3. `pipenv shell`
+4. `pipenv install`
+5. `python main.py`
+
+```python
+from transformers import (
+    AutoModel,
+    AutoConfig,
+)
+
+pretrained = 'bert-base-uncased'
+
+model_from_pretrained = AutoModel.from_pretrained(pretrained)
+model_from_config = AutoModel.from_config(AutoConfig.from_pretrained(pretrained))
+
+model_from_pretrained_params = list(model_from_pretrained.parameters())
+model_from_config_params = list(model_from_config.parameters())
+
+assert len(model_from_pretrained_params) == len(model_from_config_params)
+
+model_from_pretrained_first_param = model_from_pretrained_params[0][0][0]
+model_from_config_first_param = model_from_config_params[0][0][0]
+
+assert model_from_pretrained_first_param == model_from_config_first_param, (
+    f'{model_from_pretrained_first_param} != {model_from_config_first_param}'
+)
+```
+## Expected behavior
+An assertion error should not happen.
+
+## Environment info
+<!-- You can run the command `transformers-cli env` and copy-and-paste its output below.
+     Don't forget to fill out the missing fields in that output! -->
+     
+- `transformers` version: 2.10.0
+- Platform: MacOS
+- Python version:3.6
+- PyTorch version (GPU?):
+- Tensorflow version (GPU?):
+- Using GPU in script?:
+- Using distributed or parallel set-up in script?:
+","['tensorflow or tf' 'pytorch' 'pipeline' 'usage' 'model training'
+ 'examples' 'documentation' 'new model' 'tokenization']","[0.92909664 0.76253903 0.70074034 0.63356578 0.52656329 0.42571172
+ 0.17609936 0.16603163 0.14170577]"
+48,[0 0 0 0 0 0 0 1 0],['tokenization'],"when I encode [unused1], return not one token
+
+# 🐛 Bug
+
+## Information
+
+Model I am using (Bert, XLNet ...): bert
+
+Language I am using the model on (English, Chinese ...): English
+
+The problem arises when using: tokenizer.encode('[unused1]')
+* [ ] the official example scripts: (give details below)
+* [ ] my own modified scripts: (give details below)
+
+The tasks I am working on is:relation extraction
+* [ ] an official GLUE/SQUaD task: (give the name)
+* [ ] my own task or dataset: (give details below)
+
+## To reproduce
+
+Steps to reproduce the behavior:
+
+1. tokenizer.encode(""[unused1]"")
+2. but return not one token, if using keras-bert, it will return me only one token
+3.
+
+<!-- If you have code snippets, error messages, stack traces please provide them here as well.
+     Important! Use code tags to correctly format your code. See https://help.github.com/en/github/writing-on-github/creating-and-highlighting-code-blocks#syntax-highlighting
+     Do not use screenshots, as they are hard to read and (more importantly) don't allow others to copy-and-paste your code.-->
+
+## Expected behavior
+
+<!-- A clear and concise description of what you would expect to happen. -->
+
+## Environment info
+<!-- You can run the command `transformers-cli env` and copy-and-paste its output below.
+     Don't forget to fill out the missing fields in that output! -->
+     
+- `transformers` version: least version
+- Platform: 
+- Python version: 3.7
+- PyTorch version (GPU?):  1.1.0
+- Tensorflow version (GPU?):
+- Using GPU in script?:
+- Using distributed or parallel set-up in script?:
+","['pytorch' 'tokenization' 'tensorflow or tf' 'usage' 'pipeline' 'examples'
+ 'documentation' 'model training' 'new model']","[0.90472257 0.89118505 0.76482427 0.59634721 0.46806088 0.44722721
+ 0.29202089 0.23455259 0.13024704]"
+49,[0 0 0 0 0 1 0 0 0],['pytorch'],"--fp causes an issue when running example scripts in distributed mode
+
+# 🐛 Bug
+
+## Information
+
+Model I am using (Bert, XLNet ...):
+`roberta-large`
+Language I am using the model on (English, Chinese ...):
+`English`
+
+The problem arises when using:
+* the official example scripts
+
+The tasks I am working on is:
+* Finetuning a LM with `run_language_modeling.py` and the SST-2 task with `run_glue.py`
+* my own dataset
+
+## To reproduce
+If I run either of the following commands, I get the error included below. However, if I remove `--fp`, everything works normally. Also, if I add `--fp`, but run it non-distributed, everything works normally. So, it appears there is an issue with my running `-fp`  in a distributed fashion. I haven't had an issue with this before; so, I'm not sure what the problem is. Any ideas? Thanks in advance.
+
+I installed apex in two different way, but still get the same results.
+```
+#Install package required for fp16 computations
+RUN git clone https://github.com/NVIDIA/apex.git \
+    && cd apex \
+    && python3 setup.py install --cuda_ext --cpp_ext
+```
+```
+Install package required for fp16 computations
+RUN git clone https://github.com/NVIDIA/apex.git \
+    && cd apex \
+    && pip3 install -v --no-cache-dir --global-option=""--cpp_ext"" --global-option=""--cuda_ext"" ./
+```
+```
+python3 -m torch.distributed.launch --nproc_per_node 2 run_language_modeling.py --output_dir=/ptcc/shared/lm_roberta_20200528_164228 --model_type=roberta --do_train --train_data_file=/ptcc/data/train.txt --do_eval --eval_data_file=/ptcc/data/test.txt --evaluate_during_training --per_gpu_train_batch_size=2 --per_gpu_eval_batch_size=2 --learning_rate=5e-06 --model_name_or_path=roberta-large --mlm --max_steps=120000 --warmup_steps=10000 --save_steps=12000 --seed=42 --fp16 --logging_dir=/ptcc/shared/roberta_20200528_164228_tf_logs'
+```
+```
+python3 -m torch.distributed.launch --nproc_per_node 2 run_glue.py --model_type roberta --task_name SST-2 --do_train --do_eval --evaluate_during_training --data_dir /ptcc/data/ --per_gpu_train_batch_size 2 --per_gpu_eval_batch_size 2 --learning_rate 1e-06 --output_dir clf_roberta_20200528_162937 --model_name_or_path /ptcc/shared/lm_roberta_20200528_113420 --num_train_epochs 2.0 --save_steps 1000 --seed 42 --fp16 --logging_dir=/ptcc/shared/roberta_20200528_162937_tf_logs
+```
+
+```
+ptcc_1  | 05/28/2020 20:30:38 - INFO - transformers.trainer -     Starting fine-tuning.
+Epoch:   0%|          | 0/2 [00:00<?, ?it/s]       Traceback (most recent call last):
+ptcc_1  |   File ""/ptcc/run_glue.py"", line 228, in <module>
+ptcc_1  |     main()
+ptcc_1  |   File ""/ptcc/run_glue.py"", line 160, in main
+ptcc_1  |     model_path=model_args.model_name_or_path if os.path.isdir(model_args.model_name_or_path) else None
+ptcc_1  |   File ""/usr/local/lib/python3.6/dist-packages/transformers/trainer.py"", line 470, in train
+ptcc_1  |     tr_loss += self._training_step(model, inputs, optimizer)
+ptcc_1  |   File ""/usr/local/lib/python3.6/dist-packages/transformers/trainer.py"", line 577, in _training_step
+ptcc_1  |     scaled_loss.backward()
+ptcc_1  |   File ""/usr/lib/python3.6/contextlib.py"", line 88, in __exit__
+ptcc_1  |     next(self.gen)
+ptcc_1  |   File ""/usr/local/lib/python3.6/dist-packages/apex-0.1-py3.6-linux-x86_64.egg/apex/amp/handle.py"", line 127, in scale_loss
+ptcc_1  |     should_skip = False if delay_overflow_check else loss_scaler.update_scale()
+ptcc_1  |   File ""/usr/local/lib/python3.6/dist-packages/apex-0.1-py3.6-linux-x86_64.egg/apex/amp/scaler.py"", line 200, in update_scale
+ptcc_1  |     self._has_overflow = self._overflow_buf.item()
+ptcc_1  | RuntimeError: CUDA error: an illegal memory access was encountered
+ptcc_1  | /usr/local/lib/python3.6/dist-packages/torch/optim/lr_scheduler.py:114: UserWarning: Seems like `optimizer.step()` has been overridden after learning rate scheduler initialization. Please, make sure to call `optimizer.step()` before `lr_scheduler.step()`. See more details at https://pytorch.org/docs/stable/optim.html#how-to-adjust-learning-rate
+ptcc_1  |   ""https://pytorch.org/docs/stable/optim.html#how-to-adjust-learning-rate"", UserWarning)
+ptcc_1  |                                                  terminate called after throwing an instance of 'c10::Error'
+ptcc_1  |   what():  CUDA error: an illegal memory access was encountered (insert_events at /pytorch/c10/cuda/CUDACachingAllocator.cpp:771)
+ptcc_1  | frame #0: c10::Error::Error(c10::SourceLocation, std::string const&) + 0x46 (0x7f69777f6536 in /usr/local/lib/python3.6/dist-packages/torch/lib/libc10.so)
+ptcc_1  | frame #1: c10::cuda::CUDACachingAllocator::raw_delete(void*) + 0x7ae (0x7f6977a39fbe in /usr/local/lib/python3.6/dist-packages/torch/lib/libc10_cuda.so)
+ptcc_1  | frame #2: c10::TensorImpl::release_resources() + 0x4d (0x7f69777e6abd in /usr/local/lib/python3.6/dist-packages/torch/lib/libc10.so)
+ptcc_1  | frame #3: std::vector<c10d::Reducer::Bucket, std::allocator<c10d::Reducer::Bucket> >::~vector() + 0x1d9 (0x7f69c3926ef9 in /usr/local/lib/python3.6/dist-packages/torch/lib/libtorch_python.so)
+ptcc_1  | frame #4: c10d::Reducer::~Reducer() + 0x23a (0x7f69c391c84a in /usr/local/lib/python3.6/dist-packages/torch/lib/libtorch_python.so)
+ptcc_1  | frame #5: std::_Sp_counted_ptr<c10d::Reducer*, (__gnu_cxx::_Lock_policy)2>::_M_dispose() + 0x12 (0x7f69c38fb7c2 in /usr/local/lib/python3.6/dist-packages/torch/lib/libtorch_python.so)
+ptcc_1  | frame #6: std::_Sp_counted_base<(__gnu_cxx::_Lock_policy)2>::_M_release() + 0x46 (0x7f69c32be466 in /usr/local/lib/python3.6/dist-packages/torch/lib/libtorch_python.so)
+ptcc_1  | frame #7: <unknown function> + 0x87146b (0x7f69c38fc46b in /usr/local/lib/python3.6/dist-packages/torch/lib/libtorch_python.so)
+ptcc_1  | frame #8: <unknown function> + 0x240500 (0x7f69c32cb500 in /usr/local/lib/python3.6/dist-packages/torch/lib/libtorch_python.so)
+ptcc_1  | frame #9: <unknown function> + 0x24174e (0x7f69c32cc74e in /usr/local/lib/python3.6/dist-packages/torch/lib/libtorch_python.so)
+ptcc_1  | frame #10: /usr/bin/python3() [0x572a27]
+ptcc_1  | frame #11: /usr/bin/python3() [0x54eef2]
+ptcc_1  | frame #12: /usr/bin/python3() [0x588948]
+ptcc_1  | frame #13: /usr/bin/python3() [0x5ad438]
+ptcc_1  | frame #14: /usr/bin/python3() [0x5ad44e]
+ptcc_1  | frame #15: /usr/bin/python3() [0x5ad44e]
+ptcc_1  | frame #16: /usr/bin/python3() [0x56b276]
+ptcc_1  | frame #17: PyDict_SetItemString + 0x153 (0x5709f3 in /usr/bin/python3)
+ptcc_1  | frame #18: PyImport_Cleanup + 0x76 (0x4f2fc6 in /usr/bin/python3)
+ptcc_1  | frame #19: Py_FinalizeEx + 0x5e (0x637e2e in /usr/bin/python3)
+ptcc_1  | frame #20: Py_Main + 0x395 (0x638e95 in /usr/bin/python3)
+ptcc_1  | frame #21: main + 0xe0 (0x4b0d00 in /usr/bin/python3)
+ptcc_1  | frame #22: __libc_start_main + 0xe7 (0x7f69e4727b97 in /lib/x86_64-linux-gnu/libc.so.6)
+ptcc_1  | frame #23: _start + 0x2a (0x5b250a in /usr/bin/python3)
+```
+
+## Environment info
+- `transformers` version: 2.10.0
+- Platform: Linux-5.3.0-26-generic-x86_64-with-Ubuntu-18.04-bionic
+- Python version: 3.6.9
+- PyTorch version (GPU?): 1.5.0 (True)
+- Tensorflow version (GPU?): not installed (NA)
+- Using GPU in script?: Y,  2 Tesla V100-SXM2
+- Using distributed or parallel set-up in script?: Y,  2 Tesla V100-SXM2
+","['documentation' 'tensorflow or tf' 'usage' 'model training' 'examples'
+ 'pipeline' 'pytorch' 'tokenization' 'new model']","[0.94386345 0.93767542 0.9371109  0.93448424 0.92016047 0.91612881
+ 0.9064818  0.90300304 0.8389129 ]"
+50,[0 0 0 0 0 0 1 0 0],['tensorflow or tf'],"sometimes loss starts with nan when running ""Quick tour TF 2.0 training and PyTorch interoperability"" script
+
+# 🐛 Bug
+
+## Information
+The problem arises when using:
+* [x] the official example scripts: (give details below)
+""Quick tour TF 2.0 training and PyTorch interoperability""
+
+## To reproduce
+
+Steps to reproduce the behavior:
+
+1.run the code:
+```
+import tensorflow as tf
+import tensorflow_datasets
+from transformers import *
+
+# Load dataset, tokenizer, model from pretrained model/vocabulary
+tokenizer = BertTokenizer.from_pretrained('bert-base-cased')
+model = TFBertForSequenceClassification.from_pretrained('bert-base-cased')
+data = tensorflow_datasets.load('glue/mrpc')
+
+# Prepare dataset for GLUE as a tf.data.Dataset instance
+train_dataset = glue_convert_examples_to_features(data['train'], tokenizer, max_length=128, task='mrpc')
+valid_dataset = glue_convert_examples_to_features(data['validation'], tokenizer, max_length=128, task='mrpc')
+train_dataset = train_dataset.shuffle(100).batch(32).repeat(10)
+valid_dataset = valid_dataset.batch(64)
+
+# Prepare training: Compile tf.keras model with optimizer, loss and learning rate schedule
+optimizer = tf.keras.optimizers.Adam(learning_rate=3e-5, epsilon=1e-08, clipnorm=1.0)
+loss = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
+metric = tf.keras.metrics.SparseCategoricalAccuracy('accuracy')
+model.compile(optimizer=optimizer, loss=loss, metrics=[metric])
+
+# Train and evaluate using tf.keras.Model.fit()
+history = model.fit(train_dataset, epochs=10, steps_per_epoch=115,
+                    validation_data=valid_dataset, validation_steps=7)
+```
+2. sometimes the loss is nan and sometimes it works well:
+### nan case:
+Train for 115 steps, validate for 7 steps
+Epoch 1/10
+115/115 [==============================] - 863s 8s/step - loss: nan - accuracy: 0.3255 - val_loss: nan - val_accuracy: 0.3162
+Epoch 2/10
+115/115 [==============================] - 854s 7s/step - loss: nan - accuracy: 0.3255 - val_loss: nan - val_accuracy: 0.3162
+
+### normal case:
+Train for 115 steps, validate for 7 steps
+Epoch 1/10
+ 27/115 [======>.......................] - ETA: 11:37 - loss: 0.6249 - accuracy: 0.6609
+
+## Environment info    
+- `transformers` version: 2.9.1
+- Platform:ubuntu 16.04
+- Python version:3.6
+- PyTorch version (GPU?):1.2.0 GPU
+- Tensorflow version (GPU?):2.0.0 gpu
+- Using GPU in script?:yes
+- Using distributed or parallel set-up in script?:no
+","['model training' 'tensorflow or tf' 'pytorch' 'usage' 'tokenization'
+ 'examples' 'pipeline' 'documentation' 'new model']","[0.86156327 0.7900179  0.78300482 0.73049027 0.72127795 0.66662902
+ 0.49934721 0.43082044 0.35169956]"
+51,[0 0 0 0 0 1 0 0 0],['pytorch'],"FillMaskPipeline crashes when executed on TPU
+
+# 🐛 Bug
+
+## Information
+
+I am following the tutorial in https://colab.research.google.com/github/huggingface/blog/blob/master/notebooks/01_how_to_train.ipynb#scrollTo=QDNgPls7_l13 and running on Google Colab using the TPU. The Pipeline object creation works fine, but when I try to run it on the example sentence, the Colab runtime crashes immediately with an unclear cause and no error message. If I remove the TPU and do not install xla, the pipeline works fine.
+
+## To reproduce
+
+Steps to reproduce the behavior:
+
+```python3
+!pip uninstall transformers
+!git clone https://github.com/huggingface/transformers
+!pip install ./transformers
+
+VERSION = ""nightly"" 
+!curl https://raw.githubusercontent.com/pytorch/xla/master/contrib/scripts/env-setup.py -o pytorch-xla-env-setup.py
+!python pytorch-xla-env-setup.py --version $VERSION
+
+from transformers import pipeline
+
+fill_mask = pipeline(
+    ""fill-mask"",
+    model=""drive/My Drive/models/EsperBERTo/output/checkpoint-15000"",
+    tokenizer=""drive/My Drive/models/EsperBERTo""
+)
+
+fill_mask(""La suno <mask>."")
+
+```
+
+Is anyone else experiencing this?","['pipeline' 'pytorch' 'model training' 'usage' 'examples' 'tokenization'
+ 'new model' 'documentation' 'tensorflow or tf']","[0.95529079 0.9352107  0.92820424 0.88917434 0.82256466 0.73530209
+ 0.70091158 0.38608587 0.25698203]"
+52,[0 0 0 0 0 0 0 1 0],['tokenization'],"Tokenizer encode to have an option to overflow from left
+
+# 🚀 Feature request
+
+Current tokenizer encode variants ( encode, batch_encode, batch_encode_plus) handle longer sequences than max_length by overflowing tokens from the right hand side and thus restricting the length to max_length. This feature request is to allow an option for the tokenizer encode methods to overflow tokens from the left hand side as well.
+
+
+## Motivation
+
+For problems dealing with dialog, if one were to train an intent classification or next sentence prediction model and the dialog was longer than max_length, one would like to throw away the tokens from the beginning of the conversation as they are less relevant than the more recent messages.
+
+This motivates the need for a encoder that works well with dialog data where more recent tokens are more valuable.
+
+## Your contribution
+
+I could change the function `truncate_sequences` by adding a new truncation_strategy option that will truncate from left. But want to get feedback from the Huggingface team about this proposal.
+","['tokenization' 'model training' 'new model' 'usage' 'examples' 'pipeline'
+ 'pytorch' 'tensorflow or tf' 'documentation']","[0.93294364 0.928137   0.64636087 0.56269509 0.54916817 0.53485739
+ 0.44056588 0.3892484  0.32534406]"
+53,[0 0 0 1 0 0 0 0 0],['new model'],"Request to add MobileBert
+
+# 🌟 New model addition
+MobileBERT
+## Model description
+
+MobileBERT is a thin version of BERT_LARGE, while equipped with bottleneck structures and a carefully designed balance between self-attentions and feed-forward networks.
+
+## Open source status
+
+* [ ] the model implementation is available: (give details)
+https://github.com/google-research/google-research/tree/master/mobilebert
+
+* [ ] the model weights are available: (give details)
+https://storage.googleapis.com/cloud-tpu-checkpoints/mobilebert/uncased_L-24_H-128_B-512_A-4_F-4_OPT.tar.gz
+
+* [ ] who are the authors: (mention them, if possible by @gh-username)
+Google LLC
+Xiaodan Song
+Zhiqing Sun
+Hongkun Yu
+Denny Zou
+","['new model' 'documentation' 'usage' 'examples' 'pipeline'
+ 'model training' 'tensorflow or tf' 'pytorch' 'tokenization']","[0.99898565 0.66625202 0.55465025 0.41397366 0.39322868 0.19798161
+ 0.18034504 0.16617994 0.07195324]"
+54,[1 0 0 0 0 0 0 0 0],['documentation'],"[docs] AutoModelWithLMHead(model_name, **kwargs)
+
+`AutoModelWithLMHead.from_pretrained` cannot accept `output_attentions=True`
+
+This [docstring](https://huggingface.co/transformers/model_doc/auto.html?highlight=transformers%20automodelwithlmhead#transformers.AutoModelWithLMHead) suggests that it can.
+
+Thanks @jrvc for discovering!
+
+```python
+import transformers
+modelname='Helsinki-NLP/opus-mt-en-de'
+config_overrider={'output_attentions':True, 'output_hidden_states':True}
+self.model = transformers.AutoModelWithLMHead.from_pretrained(modelname, **config_overrider)
+=>
+*** TypeError: __init__() got an unexpected keyword argument 'output_attentions'
+```
+
+
+I will dig deeper!","['documentation' 'new model' 'model training' 'usage' 'pipeline'
+ 'tokenization' 'examples' 'pytorch' 'tensorflow or tf']","[0.99682921 0.90535772 0.66323674 0.47824654 0.39063808 0.27086896
+ 0.17753853 0.15140912 0.0411216 ]"
+55,[0 0 0 1 0 0 0 0 0],['new model'],"MPNet: Masked and Permuted Pre-training for Language Understanding
+
+# 🌟 New model addition
+
+## Model description
+
+[MPNet: Masked and Permuted Pre-training for Language Understanding](https://arxiv.org/pdf/2004.09297.pdf)
+use both Masked Language Model and Permuted Language Model
+
+## Open source status
+
+* [MPNet ] the model implementation is available: (https://github.com/microsoft/MPNet)
+* [MPNet pretrain weight ] the model weights are available: (https://modelrelease.blob.core.windows.net/pre-training/MPNet/mpnet.example.pt)
+* [@tobyoup@StillKeepTry ] who are the authors: (mention them, if possible by @gh-username)
+","['new model' 'model training' 'usage' 'documentation' 'examples'
+ 'pipeline' 'tensorflow or tf' 'pytorch' 'tokenization']","[0.9983322  0.98636502 0.92004174 0.88746476 0.52792192 0.44431019
+ 0.32310864 0.23059218 0.15243876]"
+56,[0 0 0 1 0 0 0 0 0],['new model'],"Tapas
+
+# 🌟 New model addition
+
+## Model descriptin
+
+Tapas extends Bert architecture and is a transformer-based Table QA model
+
+Paper: https://arxiv.org/abs/2004.02349
+
+## Open source status
+
+* [X] the model implementation is available: (give details)
+https://github.com/google-research/tapas
+* [X] the model weights are available: (give details)
+The pretrained weights and data for fine-tuning are linked in the repository readme
+
+* [x] who are the authors:
+@thomasmueller-google is one of the authors","['new model' 'documentation' 'model training' 'usage' 'pipeline' 'pytorch'
+ 'examples' 'tensorflow or tf' 'tokenization']","[0.99924916 0.71203083 0.58025205 0.574251   0.32388747 0.26906258
+ 0.22148596 0.09853972 0.03257477]"
+57,[0 0 0 0 0 0 0 0 1],['usage'],"BERT as encoder and a transformer as a decoder.
+
+Hi, there
+Is there probability to build a model of the BERT as the encoder and the transformer as the decoder?
+
+Thanks.","['new model' 'model training' 'usage' 'pipeline' 'examples' 'pytorch'
+ 'tensorflow or tf' 'tokenization' 'documentation']","[0.87556434 0.72950768 0.4534798  0.31244877 0.23738366 0.22739303
+ 0.18496512 0.14420253 0.06495413]"
+58,[0 0 0 0 1 0 0 0 0],['pipeline'],"Using 'ner' task in pipeline with a non default model gives me entities as ""LABEL-6"" , ""LABEL-8""  instead of ""I-ORG"" and ""I-LOC""
+
+model - dbmdz/bert-base-cased-finetuned-conll03-english
+
+Language - english
+
+The problem arises when using:
+* [x] my own modified scripts
+
+The tasks I am working on is:
+* [x] an official GLUE/SQUaD task: ner
+
+## To reproduce
+```
+tokenizer = AutoTokenizer.from_pretrained(""dbmdz/bert-base-cased-finetuned-conll03-english"")
+model = AutoModelForTokenClassification.from_pretrained(""dbmdz/bert-base-cased-finetuned-conll03-english"")
+ner_task = pipeline(task='ner', model=model, tokenizer=tokenizer)
+ner_task('Hugging Face is a French company based in New-York.')
+```
+","['pipeline' 'usage' 'new model' 'model training' 'tokenization' 'examples'
+ 'pytorch' 'documentation' 'tensorflow or tf']","[0.97761416 0.87882179 0.78068054 0.63169599 0.57461476 0.2847527
+ 0.23134506 0.14369829 0.05814513]"
+59,[0 0 0 0 0 0 0 1 0],['tokenization'],"Tokenization issue with RoBERTa and DistilRoBERTa.
+
+# 🐛 Bug
+
+## Information
+
+Model I am using (Bert, XLNet ...):
+RoBERTa (roberta-base), DistilRoBERTa (distilroberta-base)
+Language I am using the model on (English, Chinese ...):
+English
+The problem arises when using:
+* [ ] the official example scripts: (give details below)
+* [x] my own modified scripts: (give details below)
+
+I am trying to encode the embeddings for the sentences, and I found a tokenization issue with a certain (type of) sentence which ends with "")."". I noticed that the tokenizer cannot tokenize ')' from '.' and further causes issues with the sentence length.
+
+The tasks I am working on is:
+* [ ] an official GLUE/SQUaD task: (give the name)
+* [x] my own task or dataset: (give details below)
+
+**Dataset: SemEval 2016 Task 5, SB1 EN-REST**
+## To reproduce
+
+Steps to reproduce the behavior:
+
+See in the following codes:
+```python
+import torch
+import numpy as np
+from transformers import AutoModel, AutoTokenizer
+
+text = '(Besides that there should be more restaurants like it around the city).'
+for model_name in ['roberta-base', 'distilroberta-base']:
+    tokenizer = AutoTokenizer.from_pretrained(model_name)
+    model = AutoModel.from_pretrained(model_name)
+    token_dict = tokenizer.encode_plus(text, None, return_tensors='pt')
+    
+    print('model_name: {}'.format(model_name))
+    print(""Token (str): {}"".format(
+        tokenizer.convert_ids_to_tokens(token_dict['input_ids'][0])))
+    print(""Token (int): {}"".format(token_dict['input_ids']))
+    print(""Type: {}"".format(
+        token_dict['token_type_ids']))
+    print('Output Embeddings: {}\n'.format(
+        model(token_dict['input_ids'])[0].shape))
+```
+
+<!-- If you have code snippets, error messages, stack traces please provide them here as well.
+     Important! Use code tags to correctly format your code. See https://help.github.com/en/github/writing-on-github/creating-and-highlighting-code-blocks#syntax-highlighting
+     Do not use screenshots, as they are hard to read and (more importantly) don't allow others to copy-and-paste your code.-->
+
+## Expected behavior
+Expected output:
+```
+model_name: roberta-base
+Token (str): ['<s>', 'Ġ(', 'Besides', 'Ġthat', 'Ġthere', 'Ġshould', 'Ġbe', 'Ġmore', 'Ġrestaurants', 'Ġlike', 'Ġit', 'Ġaround', 'Ġthe', 'Ġcity', ')', 'Ġ.', '</s>']
+Token (int): tensor([[    0,    36, 41107,    14,    89,   197,    28,    55,  4329,   101,
+            24,   198,     5,   343,    43,   479,     2]])
+Type: tensor([[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]])
+Output Embeddings: torch.Size([1, 17, 768])
+
+model_name: distilroberta-base
+Token (str): ['<s>', 'Ġ(', 'Besides', 'Ġthat', 'Ġthere', 'Ġshould', 'Ġbe', 'Ġmore', 'Ġrestaurants', 'Ġlike', 'Ġit', 'Ġaround', 'Ġthe', 'Ġcity', ')', 'Ġ.', '</s>']
+Token (int): tensor([[    0,    36, 41107,    14,    89,   197,    28,    55,  4329,   101,
+            24,   198,     5,   343,    43,   479,     2]])
+Type: tensor([[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]])
+Output Embeddings: torch.Size([1, 17, 768])
+```
+<!-- A clear and concise description of what you would expect to happen. -->
+Basically, the expected behavior is to tokenize ')' and '.' separately. ~~Furthermore, I am also curious about what these 'Ġ' characters are in the RoBERTa encoding? I checked the vocabulary and I found both the normal words and the words starting with this 'Ġ' character so I am a bit confused.~~
+
+## Environment info
+<!-- You can run the command `transformers-cli env` and copy-and-paste its output below.
+     Don't forget to fill out the missing fields in that output! -->
+     
+- `transformers` version: 2.5.1
+- Platform: Windows-10-10.0.18362-SP0
+- Python version: 3.7.6
+- PyTorch version (GPU?): 1.4.0 (True)
+- Tensorflow version (GPU?): not installed (NA)
+- Using GPU in script?: False
+- Using distributed or parallel set-up in script?: False
+","['examples' 'usage' 'tokenization' 'documentation' 'tensorflow or tf'
+ 'pipeline' 'pytorch' 'model training' 'new model']","[0.81905109 0.80866611 0.79361981 0.78171742 0.76303601 0.74911463
+ 0.72797668 0.64164263 0.6169458 ]"
+60,[0 0 0 0 0 0 0 1 0],['tokenization'],"batch_encode_plus with pad_to_max_length but no max_length is not padding the output
+
+# 🐛 Bug
+
+## Information
+
+Model I am using BERT:
+
+Language I am using the model on (English, Chinese ...): English
+
+The problem arises when using:
+* [ ] the official example scripts: (give details below)
+* [x] my own modified scripts: (give details below)
+
+The tasks I am working on is:
+* [ ] an official GLUE/SQUaD task: (give the name)
+* [x] my own task or dataset: (give details below)
+
+## To reproduce
+
+Steps to reproduce the behavior:                                                                                                                                             
+```
+import torch
+import numpy as np
+tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
+
+seq1 = ""This is a short sequence""
+seq2 = ""This will be a much longer sequence, so the short one requires padding""
+
+input = [seq1, seq2]
+
+# Explicitly specified padding length
+max_len = 20
+tck_temp = tokenizer.batch_encode_plus(input, max_length=max_len, pad_to_max_length=True)
+inp_ids = tck_temp['input_ids']
+assert len(inp_ids[0]) == len(inp_ids[1]) == max_len, ""Both inputs should have length equal to 20""
+
+# Implicit padding length set to models max length
+model_max_len = tokenizer.max_len
+tck_temp = tokenizer.batch_encode_plus(input, pad_to_max_length=True)inp_ids = tck_temp['input_ids']
+assert len(inp_ids[0]) == len(inp_ids[1]) == model_max_len, ""Both inputs should have length equal to %d"" % model_max_len
+```
+
+## Expected behavior
+According to the documentation, `batch_encode_plus` with `pad_to_max_length=True` should pad sequence to models maximal length, if the `max_length` is not explicitly specified.
+The attached script should run without raising Exception.
+
+From documentation
+""If no max length is specified, the padding is done up to the model’s max length.""
+
+## Environment info
+<!-- You can run the command `python transformers-cli env` and copy-and-paste its output below.
+     Don't forget to fill out the missing fields in that output! -->
+     
+- `transformers` version: 2.7.0
+- Platform: Linux-4.15.0-74-generic-x86_64-with-Ubuntu-18.04-bionic
+- Python version: 3.6.9
+- PyTorch version (GPU?): 1.4.0 (False)
+- Tensorflow version (GPU?): N/A
+- Using GPU in script?: No
+- Using distributed or parallel set-up in script?: No
+","['pytorch' 'tokenization' 'usage' 'examples' 'documentation'
+ 'model training' 'tensorflow or tf' 'pipeline' 'new model']","[0.61242163 0.56115329 0.52477372 0.48390505 0.48140335 0.42546147
+ 0.33522311 0.23077276 0.20960677]"
+61,[0 0 0 0 0 0 0 0 1],['usage'],"pretrained EsperBERTo
+
+Hi,
+
+I am trying to replicate the pretraining process mentioned in this blog post: https://huggingface.co/blog/how-to-train
+
+I have time-restricted access to the GPU I'm currently working on and so I wanted to know how to save the checkpoint and resume the pretraining process from the latest checkpoint.
+
+Thanks!","['documentation' 'pipeline' 'usage' 'model training' 'pytorch' 'examples'
+ 'tensorflow or tf' 'tokenization' 'new model']","[0.60771215 0.4661127  0.4143278  0.31385469 0.27046579 0.26687345
+ 0.17103416 0.1391855  0.08762258]"
+62,[0 0 0 0 0 0 0 1 0],['tokenization'],"Issue loading custom tokenizer for fine-tuning gpt2
+
+I'm trying to fine-tune gpt2 with a custom tokenizer. It was working fine just over 10 days ago, with  --tokenizer_name=/path to vocab and merges folder/  and now it cannot load, asking to check if it's a correct model identifier or contains a config.json file. As if instead of a tokenizer it is now trying to load a model? It also asked for an extra model identifier in the config file of my model, which before was not required.
+
+I suppose there was a library update? What would be the workaround? Thanks in advance. 
+","['tokenization' 'usage' 'new model' 'pipeline' 'pytorch' 'examples'
+ 'tensorflow or tf' 'documentation' 'model training']","[0.75845677 0.70122296 0.37486807 0.33000693 0.27041611 0.23472498
+ 0.14830199 0.1252149  0.06089982]"
+63,[0 0 1 0 0 0 0 0 0],['model training'],"why isn't AlbertForMultipulChioce in modeling_albert?
+
+# ❓ Questions & Help
+
+<!-- The GitHub issue tracker is primarly intended for bugs, feature requests,
+     new models and benchmarks, and migration questions. For all other questions,
+     we direct you to Stack Overflow (SO) where a whole community of PyTorch and
+     Tensorflow enthusiast can help you out. Make sure to tag your question with the
+     right deep learning framework as well as the huggingface-transformers tag: 
+     https://stackoverflow.com/questions/tagged/huggingface-transformers 
+     
+     If your question wasn't answered after a period of time on Stack Overflow, you
+     can always open a question on GitHub. You should then link to the SO question 
+     that you posted.
+     -->
+
+## Details
+<!-- Description of your issue -->
+I just copy code from RobertaForMultipleChoice to modeling_albert and change all 'roberta' to 'albert', but the loss didn't goes dowm evidently. And the result is even worse than articles.
+<!-- You should first ask your question on SO, and only if
+     you didn't get an answer ask it here on GitHub. -->
+**A link to original question on Stack Overflow**: ","['new model' 'pytorch' 'tensorflow or tf' 'model training' 'usage'
+ 'pipeline' 'tokenization' 'documentation' 'examples']","[0.9568221  0.75872272 0.68606848 0.57712722 0.52078193 0.51462573
+ 0.45244864 0.3109071  0.22690293]"
+64,[0 0 0 1 0 0 0 0 0],['new model'],"REALM
+
+# 🌟 New model addition
+
+REALM is from some of the authors of BERT (I like to think of it as the next BERT :) ) that have found a way to incorporate world knowledge (from Wikipedia) into the model.
+
+They do this by having the concept of a retriever module that retrieves information from wikipedia articles.
+
+<!-- Important information -->
+
+## Open source status
+
+Code not released at the moment but will probably be released by Google soon I'd imagine.
+
+https://arxiv.org/abs/2002.08909
+","['new model' 'usage' 'examples' 'model training' 'pipeline' 'tokenization'
+ 'documentation' 'pytorch' 'tensorflow or tf']","[0.99474549 0.28183308 0.1855468  0.17451194 0.1387115  0.05373648
+ 0.02858443 0.02727778 0.00932299]"
+65,[0 0 1 0 0 0 0 0 0],['model training'],"Failure to load checkpoints saved during distributed training
+
+# 🐛 Bug
+
+## Information
+
+Model I am using: Bert
+
+Language I am using the model on: English, German, Swedish
+
+The problem arises when using:
+* [x] the official example scripts: (give details below)
+* [x] my own modified scripts: (give details below)
+
+The tasks I am working on is:
+* [ ] an official GLUE/SQUaD task: (give the name)
+* [x] my own task or dataset: (give details below)
+
+## To reproduce
+
+Steps to reproduce the behavior:
+
+1. Run [run_language_modeling.py](https://github.com/huggingface/transformers/blob/master/examples/run_language_modeling.py) using distributed training: e.g. 
+`python3 -m torch.distributed.launch --nproc_per_node=4 --nnodes=1 --node_rank=0 run_language_modeling.py` --output_dir output_dir [--args...]
+2. When the training is over, try to load the final model: BertModel.from_pretrained('output_dir'): this works.
+3. Then, try to load a checkpoint: e.g., `BertModel.from_pretrained('output_dir/checkpoint-1000')`: this gives a runtime error:
+`
+Traceback (most recent call last):
+  File ""/cluster/shared/nlpl/software/modules/in5550/202002/lib/python3.7/site-packages/transformers/modeling_utils.py"", line 470, in from_pretrained
+    state_dict = torch.load(resolved_archive_file, map_location=""cpu"")
+  File ""/cluster/shared/nlpl/software/modules/pytorch/1.4.0/lib/python3.7/site-packages/torch/serialization.py"", line 529, in load
+    return _legacy_load(opened_file, map_location, pickle_module, **pickle_load_args)
+  File ""/cluster/shared/nlpl/software/modules/pytorch/1.4.0/lib/python3.7/site-packages/torch/serialization.py"", line 709, in _legacy_load
+    deserialized_objects[key]._set_from_file(f, offset, f_should_read_directly)
+RuntimeError: storage has wrong size: expected 4434893008627221919 got 2359296
+`
+
+## Expected behavior
+We should be able to load from the checkpoints also when the training is distributed.
+
+## Suggested solution
+Check `if args.local_rank == -1 or torch.distributed.get_rank() == 0` on line 370 (just like on line 736).
+
+## Environment info
+- `transformers` version: 2.5.0
+- Platform: UNIX
+- Python version: Python 3.5.3
+- PyTorch version (GPU?): 1.4.0 
+- Tensorflow version (GPU?): No
+- Using GPU in script?: Yes
+- Using distributed or parallel set-up in script?: Distributed (1 node, 4 GPUs)
+","['pytorch' 'pipeline' 'examples' 'model training' 'usage'
+ 'tensorflow or tf' 'tokenization' 'documentation' 'new model']","[0.97239166 0.93115979 0.92407638 0.914666   0.90895075 0.83745676
+ 0.65357411 0.49032503 0.45284733]"
+66,[0 0 0 0 0 0 0 1 0],['tokenization'],"added_tokens.json is used for splitting texts
+
+# 🐛 Bug
+
+## Information
+
+Model I am using (Bert, XLNet ...): Bert
+
+Language I am using the model on (English, Chinese ...): English
+
+The problem arises when using:
+* [ ] the official example scripts: (give details below)
+* [x] my own modified scripts: (give details below)
+
+The tasks I am working on is:
+* [ ] an official GLUE/SQUaD task: (give the name)
+* [x] my own task or dataset: (give details below)
+
+## To reproduce
+
+Steps to reproduce the behavior:
+
+Run this script to save a pre-trained vocab, add some vocab using `added_tokens.json`. Then create a new tokenizer with the combined vocabs and use it to tokenize a sentence.
+
+```
+import os
+
+from transformers import BertTokenizer
+
+model_name = 'bert-base-uncased'
+tokenizer_path = 'tmp'
+
+if not os.path.exists(tokenizer_path):
+    os.makedirs(tokenizer_path)
+
+tokenizer = BertTokenizer.from_pretrained(model_name)
+
+tokenizer.save_vocabulary(tokenizer_path)
+
+with open(tokenizer_path + '/added_tokens.json', 'w') as f:
+    f.write('{""ver"": 30522, ""rw"": 30523}')
+
+tokenizer = BertTokenizer.from_pretrained(tokenizer_path)
+
+s = ""i want to overwrite ubuntu with windows""
+
+a = tokenizer.tokenize(s)
+print(a)
+```
+Output run 1:
+```
+['i', 'want', 'to', 'o', '##ve', 'rw', 'rite', 'u', '##bu', '##nt', '##u', 'with', 'windows']
+```
+
+Ouptut run 2:
+```
+['i', 'want', 'to', 'o', 'ver', 'write', 'u', '##bu', '##nt', '##u', 'with', 'windows']
+```
+Cause of the problem:
+
+`added_tokens.json` is [merged](https://github.com/huggingface/transformers/blob/master/src/transformers/tokenization_utils.py#L668) with `all_special_tokens`, and then used to [split](https://github.com/huggingface/transformers/blob/master/src/transformers/tokenization_utils.py#L815) the input text. Since the merged tokens is stored in an unordered set, the splitting process is non-deterministic for each run. 
+
+For example, these are how the text is split in different runs:
+
+Split Run 1 (use `rw`):
+```
+['i want to ove', 'rw', 'rite ubuntu with windows']
+```
+
+Split Run 2 (use `ver`):
+```
+['i want to o', 'ver', 'write ubuntu with windows']
+```
+Possible solution:
+Instead of `self.unique_added_tokens_encoder`, use `set(self.all_special_tokens)` to [split the text](https://github.com/huggingface/transformers/blob/master/src/transformers/tokenization_utils.py#L814)
+
+## Expected behavior
+Using `added_tokens.json` to split the text seems to be a bug to me. I expect only a small set of special tokens in the `special_tokens_map.json` should be used for this purpose.
+
+In general it is helpful to let a tokenizer behave deterministically across multiple runs. Otherwise it will be bad for certain downstream task such as [sentence embedding ](https://github.com/UKPLab/sentence-transformers) because one sentence can be encoded in many different ways. This is in particular problematic if the number of added_vocab is big. 
+
+
+## Environment info
+
+wget https://download.pytorch.org/whl/cu100/torch-1.4.0%2Bcu100-cp36-cp36m-linux_x86_64.whl
+wget https://files.pythonhosted.org/packages/7e/90/6141bf41f5655c78e24f40f710fdd4f8a8aff6c8b7c6f0328240f649bdbe/torchvision-0.5.0-cp36-cp36m-manylinux1_x86_64.whl
+
+virtualenv -p /usr/bin/python3.6 venv && . venv/bin/activate && find . -maxdepth 1 -name ""*.whl"" | xargs pip install && pip install -r requirements.txt
+
+requirements.txt:
+transformers==2.5.1
+tensorboardX==2.0
+scikit-learn==0.22.2
+     
+- `transformers` version: 2.5.1
+- Platform: Ubuntu
+- Python version: 3.6.9
+- PyTorch version (GPU?): Y
+- Tensorflow version (GPU?): N
+- Using GPU in script?: Y
+- Using distributed or parallel set-up in script?: N
+","['tensorflow or tf' 'tokenization' 'model training' 'pytorch' 'examples'
+ 'documentation' 'usage' 'new model' 'pipeline']","[0.58028561 0.53018123 0.49965391 0.49352399 0.47259718 0.45741996
+ 0.4399555  0.33972225 0.33560887]"
+67,[0 0 0 0 0 0 0 1 0],['tokenization'],"How to tokenize word to characeter
+
+I am studying machine reading comprehension on xlmroberta.
+My data is korquad.
+
+I need to tokenize all word to character.
+e.g. by english
+This is a dog 
+-> _T h i s _i s _a _d o g
+
+please let me know.","['tokenization' 'usage' 'examples' 'new model' 'documentation'
+ 'model training' 'pipeline' 'tensorflow or tf' 'pytorch']","[0.86523056 0.29378498 0.2451098  0.23600137 0.09020971 0.07057453
+ 0.06395103 0.04331259 0.01414909]"
+68,[0 0 1 0 0 0 0 0 0],['model training'],"Missing `missing_keys` when loading from saved base model checkpoint
+
+# 🐛 Bug
+
+## Information
+
+If a base model (e.g. `BertModel`, `DistilBertModel`, ...) is saved using `save_pretrained` and a model with an additional head (e.g. `BertForSequenceClassification`, `DistilBertForQuestionAnswering`, ...) is loaded from that checkpoint, it will not detect that it is missing layers.
+
+## To reproduce
+
+Steps to reproduce the behavior:
+
+1. Instantiate base model from configuration or from `from_pretrained`
+2. Save model using `save_pretrained`
+3. Load checkpoint in model with head
+4. No warning is output. Furthermore, if `output_loading_info=True` in step 3), will output `{'missing_keys': [], 'unexpected_keys': [], 'error_msgs': []}`
+
+Here's a reproducible example:
+
+```py
+from transformers import BertForSequenceClassification, BertModel, BertConfig
+
+config = BertConfig()
+base_model = BertModel(config)
+base_model.save_pretrained(directory)
+
+model, loading_info = BertForSequenceClassification.from_pretrained(directory, output_loading_info=True)
+print(loading_info)
+
+# {'missing_keys': [], 'unexpected_keys': [], 'error_msgs': []}
+# Should output {'missing_keys': ['classifier.weight', 'classifier.bias'], 'unexpected_keys': [], 'error_msgs': []}
+
+```
+
+## Expected behavior
+
+Should detect the missing keys, as it does when loading from a full checkpoint:
+
+```py
+from transformers import BertForSequenceClassification
+
+model, loading_info = BertForSequenceClassification.from_pretrained(""bert-base-cased"", output_loading_info=True)
+print(loading_info)
+
+# {'missing_keys': ['classifier.weight', 'classifier.bias'], 'unexpected_keys': ['cls.predictions.bias', 'cls.predictions.transform.dense.weight', 'cls.predictions.transform.dense.bias', 'cls.predictions.decoder.weight', 'cls.seq_relationship.weight', 'cls.seq_relationship.bias', 'cls.predictions.transform.LayerNorm.weight', 'cls.predictions.transform.LayerNorm.bias'], 'error_msgs': []}
+
+```
+
+## Environment info
+<!-- You can run the command `python transformers-cli env` and copy-and-paste its output below.
+     Don't forget to fill out the missing fields in that output! -->
+     
+- `transformers` version: master branch
+- Platform: Linux-5.5.7-arch1-1-x86_64-with-arch
+- Python version: 3.6.10
+- PyTorch version (GPU?): 1.4.0 (True)
+- Tensorflow version (GPU?): 2.1.0 (True)
+- Using GPU in script?: No
+- Using distributed or parallel set-up in script?: No
+","['pytorch' 'tensorflow or tf' 'examples' 'usage' 'pipeline'
+ 'documentation' 'tokenization' 'model training' 'new model']","[0.75984371 0.62974161 0.53428423 0.46686921 0.43179712 0.33803448
+ 0.32308242 0.16682085 0.1274354 ]"
+69,[0 0 1 0 0 0 0 0 0],['model training'],"GPU memory getting out of bound 
+
+I am trying to run the pre-trained small GPT model with language head with batch size 16. Problem is, after each iteration about 440MB of memory is allocated and quickly the GPU memory is getting out of bound. I am not running the pre-trained model in training mode. 
+In my understanding, in each iteration a single word (16 word for batch size 16) is going as input (from the second iteration) and the new attention is calculated and the `past` variable will be updated and increased for 16 word. So, a little bit of memory usage is expected but I don't understand  why it is almost half a GB. I ran the following code to measure the memory usage in each iteration: 
+```
+before=torch.cuda.max_memory_allocated(device=device)
+output, past = model(b_train_contexts,past=past)
+print(""memory usage"")
+after=torch.cuda.max_memory_allocated(device=device)
+print(after-before)
+
+```
+Output:             
+```
+memory
+0
+memory
+270742528
+memory
+442328576
+memory
+443433472
+memory
+444525056
+memory
+445629952
+memory
+446721536
+memory
+447826432
+memory
+448918016
+.
+.
+.
+```
+","['pytorch' 'usage' 'model training' 'pipeline' 'tensorflow or tf'
+ 'examples' 'tokenization' 'documentation' 'new model']","[0.86626774 0.60494113 0.5294075  0.43065685 0.37609214 0.20318207
+ 0.19078316 0.04455066 0.01593406]"
+70,[0 0 0 0 0 0 0 1 0],['tokenization'],"Adds failing tests for the fast tokenizers
+
+This ports some of the tests over that started failing on the AllenNLP side when the new fast tokenizers came out.
+
+Note: These tests are failing right now. They will need updates to the fast transformers before this can be merged. Maybe it would be better to merge this branch into the branch where the tokenizers are being fixed?","['tokenization' 'usage' 'new model' 'pipeline' 'examples' 'pytorch'
+ 'tensorflow or tf' 'model training' 'documentation']","[0.88599515 0.76076019 0.6471898  0.64053833 0.556005   0.40824169
+ 0.28787801 0.16613649 0.03975372]"
+71,[0 0 0 0 0 0 0 1 0],['tokenization'],"Fast tokenizers can't `encode_plus` a list of ids; slow tokenizers can
+
+With the slow tokenizers:
+```
+>>> import transformers
+>>> t = transformers.AutoTokenizer.from_pretrained(""bert-base-cased"", use_fast=False)
+>>> t.encode_plus([1000])
+{'input_ids': [101, 1000, 102],
+ 'token_type_ids': [0, 0, 0],
+ 'attention_mask': [1, 1, 1]}
+```
+
+With the fast tokenizers:
+```
+>>> import transformers
+>>> t = transformers.AutoTokenizer.from_pretrained(""bert-base-cased"", use_fast=True)
+>>> t.encode_plus([1000])
+Traceback (most recent call last):
+  File ""<stdin>"", line 1, in <module>
+  File ""/Users/dirkg/anaconda3/envs/allennlp/lib/python3.7/site-packages/transformers/tokenization_utils.py"", line 1889, in encode_plus
+    **kwargs,
+  File ""/Users/dirkg/anaconda3/envs/allennlp/lib/python3.7/site-packages/transformers/tokenization_utils.py"", line 1815, in batch_encode_plus
+    tokens = self._tokenizer.encode(*batch_text_or_text_pairs[0])
+  File ""/Users/dirkg/anaconda3/envs/allennlp/lib/python3.7/site-packages/tokenizers/implementations/base_tokenizer.py"", line 141, in encode
+    return self._tokenizer.encode(sequence, pair)
+TypeError
+```
+","['tokenization' 'examples' 'pytorch' 'usage' 'new model' 'documentation'
+ 'pipeline' 'model training' 'tensorflow or tf']","[0.62341565 0.31001085 0.20422915 0.15447603 0.03821681 0.03553377
+ 0.02807583 0.01151885 0.00486009]"
+72,[0 0 1 0 0 0 1 0 0],['model training' 'tensorflow or tf'],"Disabling Eager Mode Prevents Loading Pre-Trained BERT
+
+# 🐛 Bug
+
+## Information
+
+Model I am using (Bert, XLNet ...):
+**BERT**
+Language I am using the model on (English, Chinese ...):
+**English**
+
+## To reproduce
+
+Steps to reproduce the behavior:
+
+1. Disable Tensorflow eager mode `tf.compat.v1.disable_v2_behavior()`
+2. Create a pretrained BERT instance `model = transformers.TFBertModel.from_pretrained(""bert-base-uncased"")`
+
+<!-- If you have code snippets, error messages, stack traces please provide them here as well.
+     Important! Use code tags to correctly format your code. See https://help.github.com/en/github/writing-on-github/creating-and-highlighting-code-blocks#syntax-highlighting
+     Do not use screenshots, as they are hard to read and (more importantly) don't allow others to copy-and-paste your code.-->
+
+## Expected behavior
+
+<!-- A clear and concise description of what you would expect to happen. -->
+`model` contains a pre-trained BERT model
+
+## Environment info
+<!-- You can run the command `python transformers-cli env` and copy-and-paste its output below.
+     Don't forget to fill out the missing fields in that output! -->
+     
+- `transformers` version:
+- Platform: Windows-10-10.0.18362-SP0
+- Python version: 3.7.6
+- PyTorch version (GPU?): not installed (NA)
+- Tensorflow version (GPU?): 2.0.0 (True)
+- Using GPU in script?: Yes
+- Using distributed or parallel set-up in script?: No
+","['tensorflow or tf' 'model training' 'pytorch' 'documentation' 'pipeline'
+ 'usage' 'examples' 'tokenization' 'new model']","[0.8236295  0.58013034 0.5576489  0.53380567 0.50694573 0.45929673
+ 0.3690688  0.23396134 0.06589779]"
+73,[0 0 0 0 0 0 0 0 1],['usage'],"Predict the next word in sentence context from the list of possible words in Russian
+
+Hello from Russia. I have a task of predicting the next word from the list of possible words in Russian. How can I do this?
+","['tokenization' 'usage' 'new model' 'examples' 'pipeline' 'documentation'
+ 'pytorch' 'tensorflow or tf' 'model training']","[0.57719982 0.54671913 0.46721587 0.31835327 0.29676664 0.27232689
+ 0.21296503 0.1169059  0.10220153]"
+74,[0 0 0 0 0 0 0 1 0],['tokenization'],"Fast tokenizers don't properly tokenize special tokens
+
+Slow tokenizers:
+
+```
+>>> import transformers
+>>> t_slow = transformers.AutoTokenizer.from_pretrained(""roberta-base"", use_fast=False)
+>>> t_slow.encode_plus(""A <mask> sentence."")
+{'input_ids': [0, 83, 50264, 3645, 4, 2],
+ 'token_type_ids': [0, 0, 0, 0, 0, 0],
+ 'attention_mask': [1, 1, 1, 1, 1, 1]}
+
+>>> t_slow.convert_ids_to_tokens([0, 83, 50264, 3645, 4, 2])
+['<s>', 'ĠA', '<mask>', 'Ġsentence', '.', '</s>']
+```
+
+Fast tokenizers:
+```
+>>> import transformers
+>>> t_fast = transformers.AutoTokenizer.from_pretrained(""roberta-base"", use_fast=True)
+>>> t_fast.encode_plus(""A <mask> sentence."")
+{'input_ids': [0, 250, 1437, 50264, 3645, 4, 2],
+ 'token_type_ids': [0, 0, 0, 0, 0, 0, 0],
+ 'attention_mask': [1, 1, 1, 1, 1, 1, 1]}
+
+>>> t_fast.convert_ids_to_tokens([0, 250, 1437, 50264, 3645, 4, 2])
+['<s>', 'A', 'Ġ', '<mask>', 'Ġsentence', '.', '</s>'] 
+```","['tokenization' 'pytorch' 'examples' 'usage' 'tensorflow or tf' 'pipeline'
+ 'documentation' 'new model' 'model training']","[0.79549003 0.57821208 0.55773556 0.36448407 0.31784609 0.25178549
+ 0.17190257 0.15626052 0.09840047]"
+75,[0 0 1 0 0 0 0 0 0],['model training'],"AttributeError: 'Model2Model' object has no attribute 'prepare_model_kwargs' in 2.5.1
+
+# 🐛 Bug
+
+## Information
+
+Model I am using (Bert, XLNet ...):
+Model2Model
+
+Language I am using the model on (English, Chinese ...):
+English
+
+The problem arises when using:
+* [ ] the official example scripts: (give details below)
+* [x] my own modified scripts: (give details below)
+based on the quick start guide for Model2Model. 
+if I create a model using any of the following, it get an exception during the forward call : 
+```
+model = Model2Model.from_pretrained('bert-base-uncased')
+
+
+model = PreTrainedEncoderDecoder.from_pretrained('bert-base-uncased','bert-base-uncased')
+
+
+decoder_config = BertConfig.from_pretrained('bert-base-uncased', is_decoder=True)
+model = PreTrainedEncoderDecoder.from_pretrained('bert-base-uncased', 'bert-base-uncased', decoder_config=decoder_config)
+```
+
+```
+model(torch.tensor([[10,20,300,4,500,600]]).cuda(), torch.tensor([[400,500]]).cuda(), decoder_lm_labels=torch.tensor([[400,500]]).cuda())[0]
+```
+this started happening in 2.5.1
+2.5.0 didn't throw the error 
+
+stacktrace: 
+```
+---------------------------------------------------------------------------
+AttributeError                            Traceback (most recent call last)
+<ipython-input-13-77add3526cdd> in <module>()
+----> 1 model(torch.tensor([[10,20,300,4,500,600]]).cuda(), torch.tensor([[400,500]]).cuda(), decoder_lm_labels=torch.tensor([[400,500]]).cuda())[0]
+
+2 frames
+/usr/local/lib/python3.6/dist-packages/torch/nn/modules/module.py in __call__(self, *input, **kwargs)
+    530             result = self._slow_forward(*input, **kwargs)
+    531         else:
+--> 532             result = self.forward(*input, **kwargs)
+    533         for hook in self._forward_hooks.values():
+    534             hook_result = hook(self, input, result)
+
+/usr/local/lib/python3.6/dist-packages/transformers/modeling_encoder_decoder.py in forward(self, encoder_input_ids, decoder_input_ids, **kwargs)
+    221             kwargs: (`optional`) Remaining dictionary of keyword arguments.
+    222         """"""
+--> 223         kwargs_encoder, kwargs_decoder = self.prepare_model_kwargs(**kwargs)
+    224 
+    225         # Encode if needed (training, first prediction pass)
+
+/usr/local/lib/python3.6/dist-packages/torch/nn/modules/module.py in __getattr__(self, name)
+    574                 return modules[name]
+    575         raise AttributeError(""'{}' object has no attribute '{}'"".format(
+--> 576             type(self).__name__, name))
+    577 
+    578     def __setattr__(self, name, value):
+
+AttributeError: 'Model2Model' object has no attribute 'prepare_model_kwargs'
+```
+## Expected behavior
+
+No error should occur.
+
+## Environment info
+<!-- You can run the command `python transformers-cli env` and copy-and-paste its output below.
+     Don't forget to fill out the missing fields in that output! -->
+     
+- `transformers` version: 2.5.1
+- Platform: google colab
+- Python version: 3.6
+- PyTorch version (GPU?):
+- Tensorflow version (GPU?):
+- Using GPU in script?:
+- Using distributed or parallel set-up in script?:
+","['usage' 'documentation' 'model training' 'examples' 'pipeline' 'pytorch'
+ 'new model' 'tokenization' 'tensorflow or tf']","[0.81235301 0.79310173 0.79238403 0.78641379 0.7785964  0.76041538
+ 0.69999069 0.68926412 0.49862313]"
+76,[0 0 0 0 0 0 1 0 0],['tensorflow or tf'],"AttributeError: 'Tensor' object has no attribute 'size'
+
+This is the model that I have defined:
+
+```
+input_layer = keras.layers.Input(shape = (attention_mask.shape[1],), dtype='int64')
+bert = DistilBertModel.from_pretrained(""distilbert-base-cased"")(input_layer)
+bert = bert[0][:,0,:]              
+# bert = keras.layers.Dense(units=10, activation='relu')(bert)
+classifier = keras.layers.Dense(units=1, activation='sigmoid')(bert)
+model = keras.models.Model(inputs=input_layer, outputs=classifier)
+model.summary()
+```
+
+This is the error I am getting.
+```
+AttributeError                            Traceback (most recent call last)
+
+<ipython-input-12-6d7e88036056> in <module>()
+      1 input_layer = keras.layers.Input(shape = (attention_mask.shape[1],), dtype='int64')
+----> 2 bert = DistilBertModel.from_pretrained(""distilbert-base-cased"")(input_layer)
+      3 bert = bert[0][:,0,:]
+      4 # bert = keras.layers.Dense(units=10, activation='relu')(bert)
+      5 classifier = keras.layers.Dense(units=1, activation='sigmoid')(bert)
+
+1 frames
+
+/usr/local/lib/python3.6/dist-packages/transformers/modeling_distilbert.py in forward(self, input_ids, attention_mask, head_mask, inputs_embeds)
+    449             raise ValueError(""You cannot specify both input_ids and inputs_embeds at the same time"")
+    450         elif input_ids is not None:
+--> 451             input_shape = input_ids.size()
+    452         elif inputs_embeds is not None:
+    453             input_shape = inputs_embeds.size()[:-1]
+
+AttributeError: 'Tensor' object has no attribute 'size'
+```
+
+The same code works fine when distilbert is replaced with bert. What to do in this case.","['pytorch' 'new model' 'usage' 'model training' 'documentation' 'pipeline'
+ 'examples' 'tensorflow or tf' 'tokenization']","[0.64073116 0.58306921 0.55713367 0.52990842 0.52745783 0.34314248
+ 0.26581633 0.24251844 0.1906866 ]"
+77,[0 0 0 0 0 0 0 1 0],['tokenization'],"batch_encode_plus with pad_to_max_length is not padding the output
+
+# 🐛 Bug
+
+## Information
+
+Model I am using (BertTokenizer,):
+
+Language I am using the model on: English
+
+The problem arises when using:
+* [ ] the official example scripts.
+
+The tasks I am working on is:
+* [ ] Simple batch tokenization task
+
+## To reproduce
+```
+from transformers import BertTokenizer, BertForQuestionAnswering
+import torch
+
+import numpy as np
+
+tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
+model = BertForQuestionAnswering.from_pretrained('bert-large-uncased-whole-word-masking-finetuned-squad')
+
+qt1 = ('What is the name of the repository?', 'pipeline have been included in the huggingface/transformers repository')
+qt2 = ('What is the name of the repository?', 'What can be done with this???')
+
+inp_raw = [qt1, qt2]
+tck_temp = tokenizer.batch_encode_plus(inp_raw, max_length=20, pad_to_max_length=True)
+
+print(tck_temp)
+inp_ids = tck_temp['input_ids']
+tck_type_ids = tck_temp['token_type_ids']
+
+
+print(len(inp_ids[0]) == len(inp_ids[1]))
+## This is coming false
+```
+
+## Expected behavior
+
+The code snippet should print True
+But it prints False
+
+## Environment info
+     
+- `transformers` version: 2.3
+- Platform: Linux
+- Python version: 3.6
+- PyTorch version (1.4CPU)
+
+
+[EDIT] : correct transformers version","['tokenization' 'pipeline' 'examples' 'pytorch' 'usage' 'documentation'
+ 'new model' 'model training' 'tensorflow or tf']","[0.97344261 0.70962244 0.42677948 0.39488372 0.34104022 0.10927656
+ 0.09933057 0.0681059  0.02635139]"
+78,[0 0 0 0 1 0 0 0 0],['pipeline'],"[Benchmark] Pipeline for question answering
+
+# 🖥 Benchmarking `transformers`
+
+## Benchmark
+
+I'm trying to benchmark QA model with `bert-large-uncased-whole-word-masking-finetuned-squad`. But it seems it is extremely slow e.g. 3-4 sec for 1 question with 2 contexts.
+
+I feel there is something I'm missing in pipeline.
+
+## Sample Code:
+```
+def answer(self, contexts:List[str], question:str, **kwargs):
+   ## tokenizer, model, pipeline all are cached in actual implementation 
+  ## via [reify](https://docs.pylonsproject.org/projects/pyramid/en/latest/api/decorator.html) 
+  ## so model loading is not a problem.
+    tokenizer = BertTokenizer.from_pretrained('bert-base-uncased', max_len=500)
+    model = BertForQuestionAnswering.from_pretrained('bert-large-uncased-whole-word-masking- 
+        finetuned-squad')
+    pipeline('question-answering', model=model, tokenizer=tokenizer)
+    pipeline_input = []
+    for c in contexts:
+        pipeline_input.append({
+            'question' : question,
+            'context' : c
+        })
+    answers = pipeline(pipeline_input)
+```
+
+## Set-up
+CPU: Intel(R) Core(TM) i7-8700 CPU @ 3.20GHz
+memory: 16GB
+
+","['pipeline' 'examples' 'pytorch' 'new model' 'documentation' 'usage'
+ 'tensorflow or tf' 'model training' 'tokenization']","[0.98482227 0.55115026 0.50815165 0.08241931 0.07745226 0.05458887
+ 0.05310772 0.04938807 0.03051357]"
+79,[0 0 1 0 0 0 0 0 0],['model training'],"Getting the output of the from the forward function of the GPT-2
+
+Hello,
+
+Is there any way that I can extract the output of the ```self.merge_heads(a)``` and the ```self.c_proj(a)``` from the forward function for the Hugging Face GPT-2, which are found[ here](https://github.com/huggingface/transformers/blob/73028c5df0c28ca179fbe565482a9c2143787f61/src/transformers/modeling_gpt2.py#L192) and [here](https://github.com/huggingface/transformers/blob/73028c5df0c28ca179fbe565482a9c2143787f61/src/transformers/modeling_gpt2.py#L193)?
+
+Thank you,","['usage' 'pipeline' 'examples' 'model training' 'pytorch' 'new model'
+ 'tokenization' 'documentation' 'tensorflow or tf']","[0.74795812 0.7438693  0.62657547 0.59796304 0.57454753 0.50885606
+ 0.48184833 0.37012792 0.18871418]"
+80,[0 0 0 0 0 0 0 1 0],['tokenization'],"Python Tokenizer batch_encode_plus doesn't pad input if asked to do so.
+
+```python
+input_p = tokenizer_p.batch_encode_plus(
+    [""This is a simple input 1"", ""This is a simple input 2""], 
+    max_length=15, 
+    pad_to_max_length=True
+)
+```
+
+Output is not padded ","['tokenization' 'pytorch' 'usage' 'pipeline' 'examples' 'documentation'
+ 'new model' 'model training' 'tensorflow or tf']","[0.98741269 0.9373526  0.82870632 0.64236528 0.59254712 0.49324259
+ 0.40949702 0.18903011 0.03703973]"
+81,[0 0 1 0 0 0 0 0 1],['model training' 'usage'],"Change the model type after fine-tuning?
+
+# ❓ Questions & Help
+
+Is there a way in the transformer library to fine-tune a transformer on one downstream task and change to another model type (i.e. another downstream task architecture)?
+
+An example: 
+We train a BertForQuestionAnswering model (with a linear layer for the span prediction in addition to the regular BERT). Once we finished our training, I want to disregard the linear layer on top and use the adjusted weights of the 12 BERT-layers in sentiment analysis (BertForSentenceClassification).
+
+I am aware that this would result in a not initialized linear layer on top the BertForSentenceClassification, but that would be not problem in my case. ","['model training' 'examples' 'new model' 'usage' 'tensorflow or tf'
+ 'pipeline' 'documentation' 'pytorch' 'tokenization']","[0.98874003 0.72729099 0.70790142 0.46433914 0.23277339 0.09208551
+ 0.0892319  0.08700753 0.00351267]"
+82,[0 0 0 0 1 0 0 0 0],['pipeline'],"pipeline(""sentiment-analysis"")() can't handle more than 2 sentences
+
+# 🐛 Bug
+
+## Information
+
+Model I am using (Bert, XLNet ...): pipeline(""sentiment-analysis"")
+
+Language I am using the model on (English, Chinese ...): English
+
+The problem arises when using:
+* [x] the official example scripts: (give details below)
+* [ ] my own modified scripts: (give details below)
+
+The tasks I am working on is:
+* [ ] an official GLUE/SQUaD task: (give the name)
+* [x] my own task or dataset: (give details below)
+
+## To reproduce
+
+Steps to reproduce the behavior:
+
+```
+>>> from transformers import pipeline
+>>> analyzer = pipeline('sentiment-analysis')
+Downloading: 100%|██████████████████████████████| 230/230 [00:00<00:00, 146kB/s]
+>>> analyzer([""OK""]*10)
+Traceback (most recent call last):
+  File ""<stdin>"", line 1, in <module>
+  File "".../lib/python3.6/site-packages/transformers/pipelines.py"", line 490, in __call__
+    scores = np.exp(outputs) / np.exp(outputs).sum(-1)
+ValueError: operands could not be broadcast together with shapes (10,2) (10,) 
+>>> 
+```
+
+
+`
+
+<!-- If you have code snippets, error messages, stack traces please provide them here as well.
+     Important! Use code tags to correctly format your code. See https://help.github.com/en/github/writing-on-github/creating-and-highlighting-code-blocks#syntax-highlighting
+     Do not use screenshots, as they are hard to read and (more importantly) don't allow others to copy-and-paste your code.-->
+
+## Expected behavior
+
+<!-- A clear and concise description of what you would expect to happen. -->
+Getting 10 results
+
+## Environment info
+<!-- You can run the command `python transformers-cli env` and copy-and-paste its output below.
+     Don't forget to fill out the missing fields in that output! -->
+     
+- `transformers` version: 2.5.0
+- Platform: ubuntu 19.04
+- Python version: 3.6
+- PyTorch version (GPU?): 1.4.0 GPU
+- Tensorflow version (GPU?): 1.14.0 GPU
+- Using GPU in script?: Yes
+- Using distributed or parallel set-up in script?: No
+","['pipeline' 'documentation' 'pytorch' 'usage' 'examples' 'model training'
+ 'tensorflow or tf' 'tokenization' 'new model']","[0.80746061 0.64510244 0.62312531 0.57150328 0.45766917 0.40011099
+ 0.31761169 0.12833296 0.06556851]"
+83,[0 0 0 0 0 1 0 0 0],['pytorch'],"BERT model breaks during FP16 Apex training on the latest update (2.5.0) - due to gelu function
+
+# 🐛 Bug
+
+BERT breaks during FP16 training due to the gelu function.
+
+```
+File ""/home/user/miniconda/envs/py36/lib/python3.6/site-packages/transformers/modeling_bert.py"", line 407, in forward
+
+hidden_states, attention_mask, head_mask[i], encoder_hidden_states, encoder_attention_mask
+
+File ""/home/user/miniconda/envs/py36/lib/python3.6/site-packages/torch/nn/modules/module.py"", line 547, in __call__
+
+result = self.forward(*input, **kwargs)
+
+File ""/home/user/miniconda/envs/py36/lib/python3.6/site-packages/transformers/modeling_bert.py"", line 379, in forward
+
+intermediate_output = self.intermediate(attention_output)
+
+File ""/home/user/miniconda/envs/py36/lib/python3.6/site-packages/torch/nn/modules/module.py"", line 547, in __call__
+
+result = self.forward(*input, **kwargs)
+
+File ""/home/user/miniconda/envs/py36/lib/python3.6/site-packages/transformers/modeling_bert.py"", line 332, in forward
+
+hidden_states = self.intermediate_act_fn(hidden_states)
+
+File ""/home/user/miniconda/envs/py36/lib/python3.6/site-packages/torch/nn/functional.py"", line 1125, in gelu
+
+return torch._C._nn.gelu(input)
+
+RuntimeError: ""GeluCUDAKernelImpl"" not implemented for 'Half'
+```
+
+## Information
+
+The reason this is happening is because in `modeling_bert.py`, in 2.4.1 we had:
+```
+def gelu(x):
+    """""" Original Implementation of the gelu activation function in Google Bert repo when initially created.
+        For information: OpenAI GPT's gelu is slightly different (and gives slightly different results):
+        0.5 * x * (1 + torch.tanh(math.sqrt(2 / math.pi) * (x + 0.044715 * torch.pow(x, 3))))
+        Also see https://arxiv.org/abs/1606.08415
+    """"""
+    return x * 0.5 * (1.0 + torch.erf(x / math.sqrt(2.0)))
+
+...
+
+ACT2FN = {""gelu"": gelu, ""relu"": torch.nn.functional.relu, ""swish"": swish, ""gelu_new"": gelu_new, ""mish"": mish}
+```
+whereas in 2.5.0 we have:
+```
+ACT2FN = {""gelu"": gelu, ""relu"": torch.nn.functional.relu, ""swish"": swish, ""gelu_new"": gelu_new, ""mish"": mish}
+```
+where `gelu` now comes from `activations.py` as:
+`gelu = getattr(F, ""gelu"", _gelu_python)` on line 21.
+
+
+## Environment info
+<!-- You can run the command `python transformers-cli env` and copy-and-paste its output below.
+     Don't forget to fill out the missing fields in that output! -->
+     
+- `transformers` version:
+- Platform: Linux
+- Python version: 3.6
+- PyTorch version (GPU?): 1.2.0 CUDA 10.0
+- Tensorflow version (GPU?): 2.5.0
+- Using GPU in script?: V100
+- Using distributed or parallel set-up in script?: No, but using Apex FP16 training
+","['documentation' 'tensorflow or tf' 'pytorch' 'tokenization' 'usage'
+ 'model training' 'examples' 'pipeline' 'new model']","[0.73041171 0.69991094 0.57668716 0.57650411 0.55517972 0.50846553
+ 0.50399309 0.43705577 0.42011166]"
+84,[0 0 1 0 0 0 0 0 0],['model training'],"OpenAIGPTDoubleHeadsModel throws CUDA OOM with large number of candidates
+
+# 🐛 Bug
+
+I am trying to train the `OpenAIGPTDoubleHeadsModel`. I find that large number of candidates can cause CUDA OOM errors.
+
+Case 1 (single training example with 67 candidates): CUDA OOM
+```
+input_ids.shape: torch.Size([1, 67, 275])
+mc_token_ids.shape: torch.Size([1, 67])
+lm_labels.shape: torch.Size([1, 67, 275])
+mc_labels.shape: torch.Size([1])
+token_type_ids.shape: torch.Size([1, 67, 275])
+```
+
+Case 2 (single training example with 3 candidates): works fine!
+```
+input_ids.shape: torch.Size([1, 3, 275])
+mc_token_ids.shape: torch.Size([1, 3])
+lm_labels.shape: torch.Size([1, 3, 275])
+mc_labels.shape: torch.Size([1])
+token_type_ids.shape: torch.Size([1, 3, 275])
+```
+
+## Information
+
+Model I am using: `OpenAIGPTDoubleHeadsModel`
+
+Language I am using the model on: English
+
+The problem arises when using my own modified scripts based on the `transfer-learning-conv-ai` repo by Hugging Face.
+
+## To reproduce
+Simply try training `OpenAIGPTDoubleHeadsModel` with larger number of candidates (such as 67).
+
+## Expected behavior
+
+3 or 67 candidates shouldn't matter, both cases 1 and 2 should work fine without CUDA OOM.
+
+## Environment info
+     
+- `transformers` version: 2.3.0
+- Platform: Amazon Linux (Deep Learning AMI)
+- Python version: 3.6
+- PyTorch version (GPU?): the one shipped with the pytorch_p36 conda env in Amazon DL AMI
+- Using GPU in script?: Yes
+- Using distributed or parallel set-up in script?: Yes and No
+","['model training' 'examples' 'usage' 'pytorch' 'tokenization' 'new model'
+ 'documentation' 'pipeline' 'tensorflow or tf']","[0.98756593 0.82549983 0.80858302 0.68642092 0.63378549 0.46969157
+ 0.17983153 0.17323084 0.10621238]"
+85,[0 0 0 0 0 0 0 1 0],['tokenization'],"What does ## mean in the bert vocab?
+
+What does ## mean in the bert vocab?
+
+some words are starts with ##, such as ##a ##m ##er ##h ，I don't quite understand。","['new model' 'examples' 'documentation' 'pipeline' 'usage' 'pytorch'
+ 'tokenization' 'model training' 'tensorflow or tf']","[0.3621518  0.30037653 0.26881653 0.25822896 0.18810304 0.17323494
+ 0.12973444 0.11280595 0.02452286]"
+86,[0 0 1 0 0 0 1 0 0],['model training' 'tensorflow or tf'],"Masked LM implementation details
+
+I read the source code of `TFBertMLMHead`, it seems that, this layer just predict the whole sequence, rather than predict the `MASKED` tokens.
+
+`TFBertMLMHead` just do these things:
+
+* transform the `hidden state` from the last encoder layer
+* `predictions = tf.matmul(hidden_state, input_embedding_matrix)`, with shape (batch_size, sequence_length, vocab_size)
+* return the `predictions` to calculate loss
+
+The inputs are simply the `hidden state` of the last encoder layer.
+
+But the implemenmtation from [google-research/bert](https://github.com/google-research/bert/blob/cc7051dc592802f501e8a6f71f8fb3cf9de95dc9/run_pretraining.py#L240) needs extra inputs `masked_lm_positions` and `masked_lm_weights`, and then use these inputs to calculate the masked lm loss.
+
+So, does the `TFBertMLMHead` miss something?
+","['model training' 'pytorch' 'tensorflow or tf' 'pipeline' 'tokenization'
+ 'usage' 'examples' 'new model' 'documentation']","[0.7686075  0.60937834 0.59717226 0.58805424 0.5327366  0.53123468
+ 0.34240222 0.31688896 0.2384197 ]"
+87,[0 0 0 0 0 0 0 1 0],['tokenization'],"Breaking-change behavior in BERT tokenizer when stripping accents
+
+# 🐛 Bug
+
+## Information
+
+Model I am using (Bert, XLNet ...): Bert (could happen with other ones, don't know)
+
+Language I am using the model on (English, Chinese ...): English
+
+The problem arises when using:
+* [ ] the official example scripts: (give details below)
+* [x] my own modified scripts: (give details below)
+
+The tasks I am working on is:
+* [ ] an official GLUE/SQUaD task: (give the name)
+* [x] my own task or dataset: (give details below)
+
+## To reproduce
+
+```python
+from transformers import AutoTokenizer
+
+pretrained_model_name = ""bert-base-cased""
+
+fast_tokenizer = AutoTokenizer.from_pretrained(pretrained_model_name)
+slow_tokenizer = AutoTokenizer.from_pretrained(pretrained_model_name, use_fast=False)
+
+text = ""naïve""
+
+assert fast_tokenizer.encode(text) == slow_tokenizer.encode(text)
+```
+
+With the slow, it only strips accents if lowercase is enabled (maybe a bug?):
+
+https://github.com/huggingface/transformers/blob/e67676424191e5935362e5fe7e04b5c317d706a9/src/transformers/tokenization_bert.py#L346
+
+With the fast one, it'd never strip accents:
+
+https://github.com/huggingface/tokenizers/blob/python-v0.5.0/bindings/python/tokenizers/implementations/bert_wordpiece.py#L23
+
+https://github.com/huggingface/transformers/blob/e67676424191e5935362e5fe7e04b5c317d706a9/src/transformers/tokenization_bert.py#L557-L565
+
+I'd be cool to have that flag also, in both tokenizers.
+
+Finally, this warning seems odd for the simple code from above:
+
+```pycon
+>>> assert fast_tokenizer.encode(text) == slow_tokenizer.encode(text)
+Disabled padding because no padding token set (pad_token: [PAD], pad_token_id: 0).
+To remove this error, you can add a new pad token and then resize model embedding:
+	tokenizer.pad_token = '<PAD>'
+	model.resize_token_embeddings(len(tokenizer))
+Traceback (most recent call last):
+  File ""<stdin>"", line 1, in <module>
+AssertionError
+```
+
+Maybe here the `if pad_to_max_length` should be nesting the rest of the if?
+
+https://github.com/huggingface/transformers/blob/e67676424191e5935362e5fe7e04b5c317d706a9/src/transformers/tokenization_utils.py#L80-L95
+
+Didn't check in the other transformer models.
+
+## Expected behavior
+
+1. The 2 tokenizer outputs (slow and fast) should be the same.
+2. The tokenizers should allow you to choose if to strip accents or not.
+3. That warning shouldn't appear, IMHO.
+
+## Environment info
+
+- `transformers` version: 2.5.0
+- Platform: Linux-4.15.0-76-generic-x86_64-with-debian-buster-sid
+- Python version: 3.7.4
+- PyTorch version (GPU?): 1.4.0 (True)
+- Tensorflow version (GPU?): 2.0.0 (False)
+- Using GPU in script?: No
+- Using distributed or parallel set-up in script?: No","['pytorch' 'tensorflow or tf' 'usage' 'tokenization' 'examples'
+ 'model training' 'new model' 'pipeline' 'documentation']","[0.69850582 0.65801889 0.46045706 0.44423378 0.43218407 0.34350264
+ 0.28835341 0.26515776 0.21859488]"
+88,[0 0 0 0 0 0 0 1 0],['tokenization'],"squad_convert_example_to_features does not work with CamembertTokenizer
+
+# 🐛 Bug
+
+## Information
+
+Model I am using : CamemBERT
+Language I am using the model on : French
+
+The problem arises when using:
+* [*] my own modified scripts: (give details below)
+
+The tasks I am working on is:
+* [*] an official GLUE/SQUaD task: SQUaD
+
+## To reproduce
+
+Steps to reproduce the behavior:
+1 - Copy paste this and run it
+```python
+from transformers import CamembertTokenizer, SquadExample, squad_convert_examples_to_features
+
+tokenizer = CamembertTokenizer.from_pretrained('camembert-base')
+example = SquadExample(
+    'example_id',
+    ""Q"",
+    ""C D E F G H"",
+    ""D"",
+    2,
+    ""title""
+)
+features, _ = squad_convert_examples_to_features(
+    examples=[
+        example
+    ],
+    tokenizer=tokenizer,
+    max_seq_length=30,
+    doc_stride=128,
+    max_query_length=128,
+    is_training=True,
+    return_dataset=""pt"",
+    threads=1,
+)
+
+tokens = tokenizer.convert_ids_to_tokens(tokenizer.encode(example.question_text, example.context_text))
+doc_token = example.doc_tokens
+
+print({tokens[k]: doc_token[v] for k, v in features[0].token_to_orig_map.items()})
+# Outputs 
+# {'</s>': 'C', '▁C': 'D', '▁D': 'E', '▁E': 'F', '▁F': 'G', '▁G': 'H'}
+# Should be
+# {'▁C': 'C', '▁D': 'D', '▁E': 'E', '▁F': 'F', '▁G': 'G', '▁H': 'H'}
+```
+
+## Expected behavior
+
+The resulting features mapping is shifted by one when using the CamembertTokenizer.
+
+This seems to be caused by a weird check in the method `squad_convert_example_to_features`.  (`if ""roberta"" in str(type(tokenizer))`) is evaluated to False when using the CamembertTokenizer (which is adapted from RobertaTokenizer)
+
+When I patch the line `if ""roberta"" in str(type(tokenizer))` by `if ""roberta"" in str(type(tokenizer)) or ""camembert"" in str(type(tokenizer))`, I get the expected behavior. 
+
+I do not really know what would be the best way to handle this problem.
+
+## Environment info
+
+- `transformers` version: 2.4.1
+- Platform: MacOS
+- Python version: 3.7.6
+- PyTorch version : 1.4
+- Tensorflow version : None
+- Using GPU in script?: No
+- Using distributed or parallel set-up in script?: No
+","['usage' 'model training' 'examples' 'documentation' 'new model' 'pytorch'
+ 'tokenization' 'pipeline' 'tensorflow or tf']","[0.84656256 0.77314669 0.75541395 0.75342435 0.702393   0.69443929
+ 0.68328851 0.6505909  0.5376879 ]"
+89,[0 0 0 0 0 0 0 1 1],['tokenization' 'usage'],"cannot find model in model name list
+
+Hi , thank you for developing well-made pytorch version of BERT !
+
+I am new to NLP area and have problem while coding like this:
+```python
+tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
+```
+
+The error discription is below:
+```
+INFO:pytorch_pretrained_bert.file_utils:https://s3.amazonaws.com/models.huggingface.co/bert/bert-base-uncased-vocab.txt not found in cache, downloading to C:\Users\zxr\AppData\Local\Temp\tmpb3lgzjlo
+ERROR:pytorch_pretrained_bert.tokenization:Model name 'bert-base-uncased' was not found in model name list (bert-base-uncased, bert-large-uncased, bert-base-cased, bert-large-cased, bert-base-multilingual-uncased, bert-base-multilingual-cased, bert-base-chinese). We assumed 'https://s3.amazonaws.com/models.huggingface.co/bert/bert-base-uncased-vocab.txt' was a path or url but couldn't find any file associated to this path or url.
+```
+
+I searched it and thought it might be poor internet connect.
+
+I downloaded the model i want but donot know how to load it with code.
+
+Thank you very much for your attention!","['pytorch' 'tokenization' 'new model' 'usage' 'model training' 'pipeline'
+ 'examples' 'tensorflow or tf' 'documentation']","[0.95654291 0.93658221 0.89245832 0.78528905 0.74041504 0.64522737
+ 0.54677248 0.44865111 0.35871017]"
+90,[0 0 0 0 0 0 0 1 0],['tokenization'],"Installation Error - Failed building wheel for tokenizers
+
+# 🐛 Bug
+
+## Information
+
+Model I am using (Bert, XLNet ...): N/A
+
+Language I am using the model on (English, Chinese ...): N/A
+
+The problem arises when using:
+* [X] the official example scripts: (give details below)
+
+Problem arises in transformers installation on Microsoft Windows 10 Pro, version 10.0.17763 
+
+After creating and activating the virtual environment, installing transformers is not possible, because the following error occurs:
+
+""error: can not find Rust Compiler""
+""ERROR: Failed building wheel for tokenizers""
+Failed to build tokenizers
+ERROR: Could not build wheels for tokenizers which use PEP 517 and cannot be installed d
+
+The tasks I am working on is:
+[X ] transformers installation
+
+## To reproduce
+
+Steps to reproduce the behavior:
+
+1. From command line interface, create and activate a virtual environment by following the steps in this URL: https://packaging.python.org/guides/installing-using-pip-and-virtual-environments/
+2. Install transformers from source, by following the example in the topic From Source on this URL: https://github.com/huggingface/transformers
+
+<!-- If you have code snippets, error messages, stack traces please provide them here as well.
+     Important! Use code tags to correctly format your code. See https://help.github.com/en/github/writing-on-github/creating-and-highlighting-code-blocks#syntax-highlighting
+     Do not use screenshots, as they are hard to read and (more importantly) don't allow others to copy-and-paste your code.-->
+
+```
+-m pip --version
+-m pip install --upgrade pip
+-m pip install --user virtualenv
+-m venv env
+.\env\Scripts\activate
+pip install transformers
+
+ERROR: Command errored out with exit status 1:
+   command: 'c:\users\vbrandao\env\scripts\python.exe' 'c:\users\vbrandao\env\lib\site-packages\pip\_vendor\pep517\_in_process.py' build_wheel 'C:\Users\vbrandao\AppData\Local\Temp\tmpj6evjmze'
+       cwd: C:\Users\vbrandao\AppData\Local\Temp\pip-install-sza2_lmj\tokenizers
+  Complete output (10 lines):
+  running bdist_wheel
+  running build
+  running build_py
+  creating build
+  creating build\lib
+  creating build\lib\tokenizers
+  copying tokenizers\__init__.py -> build\lib\tokenizers
+  running build_ext
+  running build_rust
+  error: Can not find Rust compiler
+  ----------------------------------------
+  ERROR: Failed building wheel for tokenizers
+Failed to build tokenizers
+ERROR: Could not build wheels for tokenizers which use PEP 517 and cannot be installed directly
+
+```
+
+
+
+## Expected behavior
+
+<!-- A clear and concise description of what you would expect to happen. -->
+
+Installation of transformers should be complete.
+
+## Environment info
+<!-- You can run the command `python transformers-cli env` and copy-and-paste its output below.
+     Don't forget to fill out the missing fields in that output! -->
+     
+- `transformers` version: N/A - installation step
+- Platform: Command Line Interface / Virtual Env
+- Python version: python 3.8
+- PyTorch version (GPU?): N/A
+- Tensorflow version (GPU?): N/A
+- Using GPU in script?: N/A
+- Using distributed or parallel set-up in script?: N/A
+![tokenizers_intallation_error](https://user-images.githubusercontent.com/17074908/74371705-06b3f680-4db8-11ea-8a2d-5f920cb3caab.PNG)
+","['tensorflow or tf' 'pytorch' 'tokenization' 'examples' 'usage' 'pipeline'
+ 'documentation' 'model training' 'new model']","[0.53643632 0.53170246 0.46571636 0.45863709 0.41079772 0.39908406
+ 0.31146541 0.30138233 0.23260134]"
+91,[0 0 0 0 0 1 0 0 0],['pytorch'],"Reusing states for sequential decoding in BERTForMaskedLM
+
+# 🚀 Feature request
+
+I am using Bert as a decoder (by setting is_decoder=True). However, during sequential decoding, there is no way of reusing the hidden states, so for every word to be generated we need to rerun the model on the ENTIRE decoded sequence, which renders decoding inefficient. Can you add something similar to the keyword `past=` in GPT2 model to BERT's forward function (https://github.com/huggingface/transformers/blob/master/src/transformers/modeling_bert.py#L938)?
+
+## Generalization of my Issue
+More generally, to the best of my knowledge, there's no model in this library that simultaneously supports 1) cross attention (by feeding `encoder_hidden_states=` or `memory=`), and 2) reusing decoder states during sequential decoding (by feeding `past=`). 1) rules out models like GPT-2 and XLNet which only supports language modeling (although in theory we can just use a decoder to do translation, I want to use a separate encoder and decoder); and 2) rules out models like BERT and T5 which supports 1) but not 2). For example, the point of T5 is to use it for text-to-text translation problems, but since we cannot reuse hidden states, sequential decoding (beam search) would be extremely inefficient.
+
+## Example
+In the provided summarization example, both 1) and 2) are supported. However, the decoder is defined in its own code (examples/summarization/modeling_bertabs.py) and cannot be used directly in the library. Besides, supporting incremental state update is a basic function that every decoder shall support.
+
+## Relevant Issues
+I checked the suggested similar issues and did not find the same issue. Please let me know if my issue duplicates others'.","['examples' 'usage' 'pipeline' 'documentation' 'pytorch' 'tokenization'
+ 'model training' 'new model' 'tensorflow or tf']","[0.74226564 0.5113613  0.3346357  0.2684373  0.26084462 0.24715663
+ 0.19835658 0.15273455 0.12618214]"
+92,[0 0 1 0 0 1 0 0 0],['model training' 'pytorch'],"GPT-2 language model: multiplying decoder-transformer output with token embedding or another weight matrix
+
+I was reading the code of GPT2 language model. The transformation of hidden states to the probability distribution over the vocabulary has done in the following line:
+
+`lm_logits = self.lm_head(hidden_states)`
+Here,
+
+`self.lm_head = nn.Linear(config.n_embd, config.vocab_size, bias=False)`
+However, In the original paper, they suggested multiplying hidden states with the token embedding matrix whereas huggingface implementation used another matrix.
+
+Is there any advantage of this? Am I missing something?","['usage' 'pipeline' 'examples' 'pytorch' 'tokenization' 'new model'
+ 'model training' 'tensorflow or tf' 'documentation']","[0.62917209 0.44038826 0.38058239 0.33986276 0.28419611 0.2841723
+ 0.11210789 0.0867102  0.07743635]"
+93,[1 0 1 0 0 1 0 0 0],['model training' 'documentation' 'pytorch'],"PreTrainedModel.generate do_sample default argument is wrong in the documentation
+
+# 🐛 Bug
+
+## Information
+
+Model I am using (Bert, XLNet ...): GPT2LMHeadModel
+
+Language I am using the model on (English, Chinese ...): English
+
+The problem arises when using:
+* [ ] the official example scripts: (give details below)
+* [X] my own modified scripts: (give details below)
+
+The tasks I am working on is:
+* [ ] an official GLUE/SQUaD task: (give the name)
+* [X] my own task or dataset: (give details below)
+
+## To reproduce
+
+Steps to reproduce the behavior:
+
+1. Create GPT2LMHeadModel and GPT2Tokenizer objects using the from_pretrained('gpt2') method
+2. Use the generate function to generate sequences without any input argument multiple times, and then repeat by setting do_sample = True
+3. When do_sample is set to False (or is not supplied at all), the generate method constantly generates the following string:
+'!\n\nThe first thing I did was to make a list of all the things I would!'
+
+When generating with do_sample set to True, changing results are outputted. This is consistent with the behaviour described in the code, except for the default value of do_sample
+
+Code sample from a python shell:
+'''python
+>>> model = transformers.GPT2LMHeadModel.from_pretrained('gpt2')
+>>> g2t = transformers.GPT2Tokenizer.from_pretrained('gpt2')
+>>> g2t.decode(model.generate()[0])
+'!\n\nThe first thing I did was to make a list of all the things I would!'
+>>> g2t.decode(model.generate()[0])
+'!\n\nThe first thing I did was to make a list of all the things I would!'
+>>> g2t.decode(model.generate()[0])
+'!\n\nThe first thing I did was to make a list of all the things I would!'
+>>> g2t.decode(model.generate(do_sample=True)[0])
+""!, I can't help but wonder how she's doing. I really have no idea.!""
+>>> g2t.decode(model.generate(do_sample=True)[0])
+'!\n\nThe other guy is trying to take something away from the guy before you even start!'
+>>> g2t.decode(model.generate(do_sample=True)[0])
+'! are you kidding me?\n\n\nBut maybe you should wait for his own ""last act!'
+'''
+
+Similarly, you can do print((transformers.GPT2LMHeadModel.from_pretrained('gpt2')).config.do_sample) to verify that the 'default' argument is in fact False
+
+## Expected behavior
+The documentation should say do_sample is False by default OR the config should be updated to be in line with the documentation
+
+## Environment info
+<!-- You can run the command `python transformers-cli env` and copy-and-paste its output below.
+     Don't forget to fill out the missing fields in that output! -->
+     
+- `transformers` version: 2.4.1
+- Platform: Ubuntu GNU/Linux 18.04
+- Python version: Python 3.6.9 (default, Nov  7 2019, 10:44:02) [GCC 8.3.0] on linux
+- PyTorch version (GPU?): 1.4.0 GPU version with Nvidia RTX 2080Ti
+- Tensorflow version (GPU?): N/A
+- Using GPU in script?: No
+- Using distributed or parallel set-up in script?: No
+","['model training' 'pytorch' 'tokenization' 'usage' 'examples'
+ 'tensorflow or tf' 'documentation' 'pipeline' 'new model']","[0.80073494 0.78240043 0.69097757 0.67826766 0.65534866 0.62645596
+ 0.59662646 0.56657118 0.49700382]"
+94,[0 0 1 0 0 0 0 0 1],['model training' 'usage'],"How can I finetune the BERTModel on my own corpus?
+
+# ❓ Questions & Help
+
+<!-- The GitHub issue tracker is primarly intended for bugs, feature requests,
+     new models and benchmarks, and migration questions. For all other questions,
+     we direct you to Stack Overflow (SO) where a whole community of PyTorch and
+     Tensorflow enthusiast can help you out. Make sure to tag your question with the
+     right deep learning framework as well as the huggingface-transformers tag: 
+     https://stackoverflow.com/questions/tagged/huggingface-transformers 
+     
+     If your question wasn't answered after a period of time on Stack Overflow, you
+     can always open a question on GitHub. You should then link to the SO question 
+     that you posted.
+     -->
+
+## Details
+<!-- Description of your issue -->
+Thanks for your code!
+
+I want to fine-tune the BERT model on my own corpus which has a smaller vocabulary than the default size of 30522, and my final goal is to obtain a fine-tuned and personalized BERT model which can provide proper word embedding for future top tasks. In short, I need to fine-tune the BERTModel for providing word embedding based on my own corpus.
+
+How can I build a new vocabulary and then fetch the embeddings from the provided pre-trained model, e.g., bert-base-uncased, and then fine-tune the model on my own corpus?
+
+Have you provided functions for building vocabulary and further fine-tuning?
+","['tensorflow or tf' 'pytorch' 'new model' 'usage' 'pipeline'
+ 'tokenization' 'model training' 'examples' 'documentation']","[0.73263258 0.64303237 0.61526883 0.55980521 0.45359242 0.32701883
+ 0.27945867 0.20356256 0.17025496]"
+95,[0 0 0 0 0 0 1 0 1],['tensorflow or tf' 'usage'],"You must specify an aggregation method to update a MirroredVariable in Replica Context.
+
+# You must specify an aggregation method to update a MirroredVariable in Replica Context.
+
+##  
+   <ipython-input-28-7cf32baaf070>:52 step_fn  *
+        gradient_accumulator(grads)
+    /tensorflow-2.1.0/python3.6/tensorflow_core/python/distribute/distribute_lib.py:763 experimental_run_v2
+        return self._extended.call_for_each_replica(fn, args=args, kwargs=kwargs)
+    /usr/local/lib/python3.6/dist-packages/transformers/optimization_tf.py:229 __call__  *
+        accum_gradient.assign_add(gradient)
+    /tensorflow-2.1.0/python3.6/tensorflow_core/python/distribute/values.py:1124 assign_add
+        return self._assign_func(f=assign_add_fn, *args, **kwargs)
+    /tensorflow-2.1.0/python3.6/tensorflow_core/python/distribute/values.py:1108 _assign_func
+        variable_type=""MirroredVariable""))
+
+Model I am using (Bert, XLNet ...): Bert
+
+Language I am using the model on (English, Chinese ...): English
+
+using GPU: Yes 
+
+The problem arises when using:
+ Training on multiple gpus and accumulating gradient as given in run_tf_ner.py
+
+","['model training' 'examples' 'usage' 'pytorch' 'tensorflow or tf'
+ 'pipeline' 'new model' 'tokenization' 'documentation']","[0.96132272 0.63294327 0.61240369 0.59575814 0.52971339 0.41840684
+ 0.25702864 0.22437601 0.17628172]"
+96,[1 0 0 0 0 0 0 0 1],['documentation' 'usage'],"tiny issue with distilbertconfig docs
+
+# 🐛 Bug (barely) 
+
+Discrepancy in variable names between docs and code: 
+I presume [``intermediate_size``](https://github.com/huggingface/transformers/blob/520e7f211926e07b2059bc8e21b668db4372e4db/src/transformers/configuration_distilbert.py#L63) refers to [``hidden_dim``](https://github.com/huggingface/transformers/blob/520e7f211926e07b2059bc8e21b668db4372e4db/src/transformers/configuration_distilbert.py#L109)?
+","['documentation' 'examples' 'usage' 'new model' 'pipeline' 'tokenization'
+ 'model training' 'pytorch' 'tensorflow or tf']","[0.93013316 0.30680308 0.25519222 0.11035404 0.04624964 0.03380809
+ 0.0323838  0.01848633 0.0056041 ]"
+97,[0 0 0 0 0 1 0 0 1],['pytorch' 'usage'],"Is there any way that I can extract the hidden output from the self-attention layer?
+
+Hello,
+
+From my understanding, for the ```GPT2LMHeadModel```, the output ```past``` allows me to retrieve the key and value vectors that are used in the self-attention block (which is prior to the feedforward block). 
+
+Is there any way I can extract the output of the self-attention block **at a particular head of a single layer** of ```GPT2LMHeadModel``` (if I am understanding this correctly, the output ```hidden_states``` only returns the output after the input had gone into the feedforward block... but what I want is to extract the output from the self-attention block, which happens before the feedforward block).
+
+Thank you,","['usage' 'pytorch' 'pipeline' 'tensorflow or tf' 'model training'
+ 'examples' 'new model' 'tokenization' 'documentation']","[0.84812123 0.73237962 0.71662146 0.54575044 0.52065766 0.50649631
+ 0.42120665 0.37603    0.33103698]"
+98,[0 0 1 0 0 0 0 0 1],['model training' 'usage'],"why take the first hidden state for sequence classification (DistilBertForSequenceClassification)
+
+In the last few layers of sequence classification [here][1], the first hidden state of the sequence length of the transformer output to be used for classification. 
+
+    hidden_state = distilbert_output[0]  # (bs, seq_len, dim) <-- transformer output
+    pooled_output = hidden_state[:, 0]  # (bs, dim)           <-- first hidden state
+    pooled_output = self.pre_classifier(pooled_output)  # (bs, dim)
+    pooled_output = nn.ReLU()(pooled_output)  # (bs, dim)
+    pooled_output = self.dropout(pooled_output)  # (bs, dim)
+    logits = self.classifier(pooled_output)  # (bs, dim)
+
+Is there any benefit to taking the first hidden state over the last, average, or even the use of a Flatten layer instead?
+
+I've also asked this question on [Stack Overflow](https://stackoverflow.com/questions/60087613/why-take-the-first-hidden-state-for-sequence-classification-distilbertforsequen)
+
+
+  [1]: https://github.com/huggingface/transformers/blob/33d3072e1c54bcd235447b98c6dea1b4cb71234c/src/transformers/modeling_distilbert.py#L634","['usage' 'pipeline' 'pytorch' 'examples' 'tensorflow or tf'
+ 'documentation' 'new model' 'tokenization' 'model training']","[0.67335254 0.51125228 0.48085499 0.40946567 0.3619439  0.31997675
+ 0.3162052  0.20305324 0.14984009]"
+99,[0 0 0 0 0 1 0 0 1],['pytorch' 'usage'],"Albert language model fine tuning not running run_lm_finetuning.py
+
+# ❓ Questions & Help
+
+## Information
+
+Model I am using (Albert(all types)):
+
+Language I am using the model on (English):
+
+The problem arises when using:
+* [ ] the official example scripts: (give details below)
+the code returns memory allocation problems when run with any version from albert. i tried to reduce the sequence length and batch size to a minum setting, but the issue still arises. my setting and the minimized setting both run normally with bert or roberta, the issue arises only when i change the model to Albert.
+an example:
+`tcmalloc: large alloc 1951195136 bytes == 0x7f750f664000 @  0x7f76efbf8887 0x7f764c2a1b79 0x7f764c29fb0f 0x7f764c29fc33 0x7f764c26a155 0x7f764c26837e 0x7f764c26bbb1 0x7f764c2606df 0x50a8af 0x50c5b9 0x509d48 0x50aa7d 0x50c5b9 0x508245 0x509642 0x595311 0x5a067e 0x50d966 0x58efc9 0x4c9546 0x5886f4 0x58892e 0x551b81 0x5aa6ec 0x50abb3 0x50c5b9 0x508245 0x50a080 0x50aa7d 0x50c5b9 0x508245`
+
+The tasks I am working on is:
+* [ ] my own task or dataset: (give details below)
+language model finetuning for albert
+## To reproduce
+
+Steps to reproduce the behavior:
+
+1. in run_lm_finetuning add:
+` from transformers import (AlbertConfig,
+    AlbertForMaskedLM,
+    AlbertTokenizer,
+)`
+2.add to MODEL_CLASSES dictionary:
+`    ""albert"": (AlbertConfig, AlbertForMaskedLM, AlbertTokenizer),`
+3. add file text.txt, a similar txt file to the wiki dataset that's mentioned in the docs. 
+4.run the finetuning script:
+`python transformers/examples/run_lm_finetuning.py \
+    --output_dir=output \
+    --model_type=albert \
+    --model_name_or_path=albert-base-v1 \
+    --do_train \
+    --train_data_file test.txt \
+    --block_size 50 \
+    --per_gpu_train_batch_size 2 \
+    --max_steps 520000 \
+    --weight_decay 0.01 \
+    --logging_steps 5000 \
+    --mlm`
+
+
+
+## Expected behavior
+
+<!-- A clear and concise description of what you would expect to happen. -->
+
+## Environment
+
+* OS: Google colab
+* Python version: 3.7
+* PyTorch version: 1.3.1
+* `transformers` version (or branch): latest
+* Using GPU ? yes
+* Distributed or parallel setup ? no
+* Any other relevant information:
+","['usage' 'examples' 'documentation' 'model training' 'pytorch'
+ 'tokenization' 'pipeline' 'tensorflow or tf' 'new model']","[0.84775645 0.83859682 0.80375695 0.79974645 0.70657372 0.69624603
+ 0.69027811 0.62100118 0.6083585 ]"
+100,[0 0 0 0 1 0 0 0 0],['pipeline'],"Question answering pipeline fails with long context
+
+## 🐛 Bug
+
+<!-- Important information -->
+
+Model I am using (Bert, XLNet....): Question Answering Pipeline / Distilbert
+
+Language I am using the model on (English, Chinese....):
+
+The problem arise when using:
+* [x] the official example scripts: (give details): Based on the sample pipeline code form here: https://github.com/huggingface/transformers#quick-tour-of-pipelines
+* [] my own modified scripts: (give details)
+
+The tasks I am working on is:
+* [x] an official GLUE/SQUaD task: (give the name)
+* [ ] my own task or dataset: (give details)
+
+## To Reproduce
+I think I found a bug in the pipeline code. It fails when there's a long context in a list. See below:
+
+
+```
+from transformers import pipeline
+nlp = pipeline('question-answering')
+
+long_str = 'These are some irrelevant words. ' * 100
+long_str = 'Pipeline have been included in the huggingface/transformers repository. ' + long_str
+
+#Works
+nlp(
+    {
+    'question': 'What is the name of the repository ?',
+    'context': 'Pipeline have been included in the huggingface/transformers repository. '
+    },
+    {
+    'question': 'What is the name of the repository ?',
+    'context': 'Pipeline have been included in the huggingface/transformers repository. '
+    }     
+)
+
+#Long context by itself - works
+nlp(
+    {
+    'question': 'What is the name of the repository ?',
+    'context': long_str
+    })
+
+
+#Long context in a list - fails
+nlp(
+    {
+    'question': 'What is the name of the repository ?',
+    'context': long_str
+    },
+    {
+    'question': 'What is the name of the repository ?',
+    'context': 'Pipeline have been included in the huggingface/transformers repository. '
+    }     
+)
+```
+
+Here's the error message:
+```
+Converting examples to features: 100%|██████████| 2/2 [00:00<00:00, 87.19it/s]
+Traceback (most recent call last):
+
+  File ""<ipython-input-3-e795fc7f26bf>"", line 8, in <module>
+    'context': 'Pipeline have been included in the huggingface/transformers repository. '
+
+  File ""c:\users\admin\appdata\local\programs\python\python37\lib\site-packages\transformers\pipelines.py"", line 686, in __call__
+    for s, e, score in zip(starts, ends, scores)
+
+  File ""c:\users\admin\appdata\local\programs\python\python37\lib\site-packages\transformers\pipelines.py"", line 686, in <listcomp>
+    for s, e, score in zip(starts, ends, scores)
+
+IndexError: index 0 is out of bounds for axis 0 with size 0
+```
+
+<!-- If you have a code sample, error messages, stack traces, please provide it here as well. -->
+
+## Expected behavior
+
+
+Would like to get the answer for the second example.
+
+<!-- A clear and concise description of what you expected to happen. -->
+
+## Environment
+
+* OS: Windows
+* Python version:  Python 3.7.0 (v3.7.0:1bf9cc5093, Jun 27 2018, 04:59:51) [MSC v.1914 64 bit (AMD64)]
+* PyTorch version: N/A
+* PyTorch Transformers version (or branch): master
+* Using GPU ?
+* Distributed or parallel setup ?
+* Any other relevant information:
+
+## Additional context
+
+<!-- Add any other context about the problem here. -->
+","['tensorflow or tf' 'tokenization' 'pytorch' 'usage' 'pipeline' 'examples'
+ 'documentation' 'model training' 'new model']","[0.69823921 0.55518907 0.43907112 0.39334464 0.37575823 0.37352651
+ 0.36481556 0.31350082 0.28596517]"
+101,[0 0 0 0 1 0 0 0 0],['pipeline'],"Getting started with the new 'FeatureExtractionPipeline' feature
+
+Hi,
+
+At the moment I'm trying to extract features of the second last layer using the ""run_lm_finetuning.py"" script in combination with the setting ""output_hidden_sates=True"".
+
+I'm wondering if this new FeatureExtractionPipeline feature would be a good alternative and how to get started using this new feature. I have been trying to read the documentation and so far I have figured out I should do something along the lines of:
+
+`from transformers import pipeline`
+`nlp = pipeline('feature-extraction', model='', config='', tokenizer='', binary_output=True,)`
+
+I'm pretty sure I'm missing some important parameters and details however. For example the input and output parameter. Only looking at the code alone makes me a little puzzled at the moment since I'm not very proficient yet with Python and Pytorch and the official documentation has not much documentation and examples on this new feature yet.
+
+Can someone please help me get started using this new feature by giving some good example and point towards some important parameters to get started?","['examples' 'new model' 'tokenization' 'pipeline' 'pytorch' 'usage'
+ 'documentation' 'model training' 'tensorflow or tf']","[0.79127431 0.78700727 0.78086299 0.75920236 0.7441805  0.62788957
+ 0.61655831 0.35428032 0.29989666]"
+102,[0 0 0 0 1 0 0 0 0],['pipeline'],"Fixed answer structure for QAPipeline
+
+Updated answers list in QuestionAnswering pipeline to handle multiple (question, context) pair with (top-k >1) solutions","['new model' 'pipeline' 'usage' 'documentation' 'tokenization' 'examples'
+ 'pytorch' 'tensorflow or tf' 'model training']","[0.93094957 0.74114746 0.47706386 0.34044623 0.24561147 0.24473463
+ 0.18001711 0.1695082  0.04897889]"
+103,[0 0 0 0 1 0 0 0 0],['pipeline'],"Pipelines: add PoS support
+
+## 🚀 Feature
+
+As `Pipelines` were recently added for many tasks including NER, Sentiment Analysis, it'd be great to also enable Part-of-Speech tagging.
+
+## Motivation
+
+PoS tagging is a very useful task, and often used as an evaluating downstream task for new models.
+
+## Additional context
+
+Current available tasks for `Pipelines` are described [here](https://github.com/huggingface/transformers/blob/master/src/transformers/pipelines.py#L831).
+","['pipeline' 'new model' 'usage' 'pytorch' 'tensorflow or tf' 'examples'
+ 'model training' 'documentation' 'tokenization']","[0.87658203 0.66072726 0.63349891 0.50837702 0.50084537 0.36267754
+ 0.22368059 0.11388215 0.04204831]"
+104,[0 0 0 0 1 0 0 0 0],['pipeline'],"Train custom NER model with new Pipeline
+
+## 🚀 Feature
+
+New `Pipelines` feature is great! I am wondering whether it will be possible to implement a pre-training on domain specific data (similar to ULMFiT approach, unsupervised encoder-decoder) and then train a custom NER model with annotated data (similar to spaCy)?","['model training' 'new model' 'pipeline' 'examples' 'usage' 'pytorch'
+ 'tensorflow or tf' 'tokenization' 'documentation']","[0.99007839 0.93468982 0.72541893 0.53239387 0.38030359 0.29521516
+ 0.24981785 0.15682338 0.11498935]"
+105,[0 0 0 0 1 0 0 0 0],['pipeline'],"NER pipeline missing start/end
+
+## 🚀 Feature
+
+2.3 is a great release! Really excited for pipelines.
+
+The feature to add is the start/end positions of the entities. 
+
+Additionally, the option to show the recognized entity rather than in subword form would be more user-friendly as an API.
+
+## Motivation
+
+[The release mentions including positions of the entities](https://github.com/huggingface/transformers/releases/tag/v2.3.0). The start/end positions are not in `transformers.py`
+
+## Additional context
+This is really exciting and motivated me to use your module. I hope to make a PR in the future.
+","['pipeline' 'new model' 'usage' 'examples' 'pytorch' 'tensorflow or tf'
+ 'tokenization' 'documentation' 'model training']","[0.88609678 0.73860431 0.71824968 0.50539869 0.40289971 0.38487929
+ 0.36498848 0.28044593 0.25251472]"
