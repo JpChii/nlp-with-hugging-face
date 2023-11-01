@@ -39,7 +39,3 @@ Tokenizer are used to convert raw text to input_ids. Tokenizer might use one of 
 * Training the classification head
 
 
-## Reading List
-
-1. [Datasets documentation](https://huggingface.co/docs/datasets/index)
-2. [Andrei Karpathy's recipe to train neural networks](https://karpathy.github.io/2019/04/25/recipe/)

@@ -29,6 +29,17 @@ hub --> Hugging face Hub
         return {"ner_tags_str": [tags.int2str(idx) for idx in batch["ner_tags"]]}
     panx_de = panx_ch["de"].map(create_tag_names)
     ```
+* To shuffle a dataset to avoid bias, call `shuffle()` on the desired split on  `Dataset`
+```Python
+dataset = load_dataset("some-dataset")
+dataset_shuffled = dataset["split"].shuffle()
+```
+* To select random number of samples from the split, call `select()` on the desired split on `Dataset`
+```Python
+dataset = load_dataset("some-dataset")
+dataset_selected = dataset["split"].select(subset_of_indexes)
+```
+
 
 ## Metric
 
@@ -39,3 +50,12 @@ Datasets library holds Metric class, which provides access to implementations of
 from datasets import load_metric
 seq_eval = load_metric("seqeva")
 ```
+
+## Datasets
+
+This'll cover the datasets used in the series of notebooks in this section.
+
+1. Cross-lingual Transfer Evaluation of Multilingual Encoder (XTREME) benchmark called [WikiANN or PAN-x](https://huggingface.co/datasets/wikiann). This dataset has wikipedia articles in multiple languages.
+2. `Benchamrk` -> To measure the performance of cross-lingual NER, the below datasets are often used:
+    * [CoNLL-2002](https://huggingface.co/datasets/conll2002) 
+    * [CoNLL-2003](https://huggingface.co/datasets/conll2003)

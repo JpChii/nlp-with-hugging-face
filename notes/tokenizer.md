@@ -43,7 +43,10 @@ After pretokenization,
 * Serveral subword tokenization algorithms exist
     - BPE
     - Unigram
-    - WordPiece
+    - WordPiece[BERT]
+        Uses [CLS] and [SEP] tokens to indicate start and end of text
+    - Sentence-Piece[XLMRoBERTa]
+        Uses <s> and </s> tokens to indicate start and end of text
 * Now we've a list of integers(input IDs)
 
 Now text becomes like below,

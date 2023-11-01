@@ -5,4 +5,3 @@
 5. Establish a baseline
 6. Select metrics to evaluate the models
 7. Process the data to numbers or the format that is accepted by the model
-8. 
