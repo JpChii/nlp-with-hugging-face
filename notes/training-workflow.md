@@ -2,6 +2,9 @@
 2. What data is available?
 3. Explore the data, feature engineer if possible
 4. Create train, test, validation splits
-5. Establish a baseline
-6. Select metrics to evaluate the models
-7. Process the data to numbers or the format that is accepted by the model
+5. Select metrics to evaluate the models
+6. Convert data to numbers
+7. Establish a baseline
+8. Calculate metrics for baseline
+9. Fine tune model
+10. Error analysis
