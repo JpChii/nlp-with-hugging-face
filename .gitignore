@@ -6,3 +6,4 @@ others/.env
 haystack/
 models/
 commit.txt
+ds_embeddings/
