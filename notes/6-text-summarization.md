@@ -14,6 +14,13 @@ In this notebook we'll cover,
 * Pretrained transformers to summarize documents, (i.e) our own encoder-decoder model to condense dialouges between several people into a crisp summary.
 
 ***Dataset to be used in this notebook*** --> [CNN/DailyMail corpus](https://huggingface.co/datasets/cnn_dailymail)
+The dataset consist of 300,000 pairs of articles and their summaries from CNN and dailymail. The summaries are abstractive(new text and simple extracts from the article) and not extractives.
+
+Documents/Articles will probabaly be n times bigger than Summary/Highlights, This'll be limitation with transformers with restricted context length.
+
+## Baseline
+
+A common baseline for summarizing is to take the first three sentences of the articles. We can achieve this using [nltk's sent_tokenize](https://www.nltk.org/api/nltk.tokenize.sent_tokenize.html)
 
 ## Summarization models
 
@@ -38,10 +45,14 @@ Let's load this and test it out.
 
 *All T5 capabalities*
 ![alt t5](../notes/images/6-summarization/t5-capabalities.png)
+1. Translation
+2. Semantic similarity
+3. Summarization
+4. Linguistic Acceptability
 
 #### BART
 
-BART also uses an encoder-decoder architecture and is trained to reconstruct corrupted inputs. It combines the pretraining schems of bert and GPT-2. We'll use the `facebook/bart-large-cnn` checkpoint, which has been specifically fine-tuned on CNN/DailyMail dataset
+BART also uses an encoder-decoder architecture and is trained to reconstruct corrupted inputs. It combines the pretraining schems of bert(MLM) and GPT-2(Next word prediction). We'll use the `facebook/bart-large-cnn` checkpoint, which has been specifically fine-tuned on CNN/DailyMail dataset
 
 #### PEGASUS
 

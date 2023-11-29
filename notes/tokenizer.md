@@ -95,3 +95,16 @@ tokens = tokenizer(text).tokens()
 ## Outputs
 
 * `token_type_ids` --> this is used to differentiate two segments of inputs where it's passed as pair. Ex in QA inputs question tokens will have token_type_ids as 0 and context will have 1.
+
+## Other Tokenizers
+
+### NLTK Sentence Tokenizer
+
+Splits sequences based on sentences
+
+```Python
+import nltk
+from nltk.tokenize import sent_tokenize
+```
+
+This tokenizer is capabale of differentiation difference between a . in abbreviations vs a . at the end of sentence.
