@@ -82,3 +82,73 @@ On looking at these few samples, we can see the romantic skew in GPT generation,
 In general, any model trained on dataset will reflect the language bias and over-or underrepresentation of populations and events in its training data. These biases in the behaviour of the model are importatnt to take into consideration with reagard to the target audience interacting with the model.
 
 The brief introduction above will give an idea of the difficult challenges faced during creation of a large corpora. With these in mind, let's create a large dataset.
+
+## Building a Custom Code Dataset
+
+Refer page 681 to 686 to create a custom dataset using below google bigquery.
+
+```Sql
+SELECT f.repo_name, f.path, c.copies, c.size, c.content
+FROM `bigquery-public-data.github_repos.files` AS f
+JOIN `bigquery-public-data.github_repos.contents` AS c ON f.id = c.id
+JOIN `bigquery-public-data.github_repos.licenses` AS l ON f.repo_name = l.repo_name
+WHERE  NOT c.binary
+ AND ((f.path LIKE '%.py')
+ AND (c.size BETWEEN 1024
+ AND 1048575))
+```
+
+* In this section, the results above query is exported to Google bucket and downloaded with gsutil to local.
+* BigQuery gives access to google inventory, which has snapshots of github repos to allow us to download data in bulk without limitations of Github REST API.
+* The query creates an export of public python repositores in github
+* The results of this query is around 2.7TB uncompressed data and 50GB of compressed data.
+
+***To filter the noise or not?***
+* We've to make decisions on the noise in the data, 
+    * Noise in training data can make system more robust to noisy inputs at inference time
+    * Will also make random predictions 
+* Depending on intended use and whole system integration, we can choose between more or less noisy data and add pre and post filtering operations.
+* Data preparation is a crucial step and we've to clean up the dataset as much as possible.
+
+### Working with large Datasets
+
+Loading a large dataset of 50GB compressed data or 200TB of compressed data into RAM is a challenging task.
+`Datasets` is designed in a way to overcome this with two specific features that allows to free from RAM and hard drive space limitations: memeory mapping and streaming.
+
+#### Memory mapping
+
+* Dataset activate zero-copy and zero-overhead memory by default.
+* A direct reflection of content in RAM memory is stored as a file in drive(cached). Each dataset is stored in this manner.
+* Then a read only pointer is pointed to this file and uses it as a substitute for RAM, basicalluy using hard drive as a extenstion of RAM memory.
+
+--> With above features from Datasets, we can now load a large dataset in a machine provided adequate hard disk space is available.
+
+* In addition to zero-shot/zero-overhead Datasets use Apache Arrow under the hood, which makes it very efficient to access any element. Depeneding on speed of hard drive and batch sizer, we can iterate from tenths of GB to serveral GB/s.
+
+#### Streaming
+
+***What if we don't have enough hard disk space to load data with memory mapping?***
+
+This is where streaming comes in.
+
+* We can push our dataset to huggingface_hub and download the data on the fily.
+* We'll get a `IterableDataset`
+* With IterableDataset, we've to fetch data in order and cannot access elements randomnly
+* `shuffle()` will download samples over a buffer of examples
+* This will randomize order of files for every iteration.
+
+To upload files to huggingface_hub refer page 692 to 696.
+
+## Building a Tokenizer
+
+* Now we've a dataset, next we've to efficiently process the data to feed it to the model
+* *Can we use tokenizers like in previous notebooks?* -- **No** Because the tokenizers have their preprocessing pipeline for a specific domain or dataset. We've to consider the domain and preprocessing of an Tokenizer(from huggingface) before using it.
+* Some pitfalls of using a Tokenizer without understading it's inner workings:
+    1. If we use T5 tokenizer trained on C4 corputs, we'll never see common English words like "sex." Since it used an extensive stopword filtering to create the dataset.
+    2. If we use CamemBERT tokenizer which is trained on French subset of OSCAR corpus, it will be unaware of English words.
+* Due to these concers, we've to stick with same preprocessing design choices selected for pretraining. Otherwise the model may be fed out-of-distribution patterns or unkown tokens.
+
+> Training a tokenizer doesn't involve backpropogation or weights like training a model. It's a way to create a optimal mapping of string of text to a list of integers that can be ingested to a model. In today's tokenizers the optimal sstring to integer conversion involves:
+    1. A list of atomic strings vocabulary
+    2. A method to cut, nromaalize or map a text string into a list of indices with this vocabulary. This is then fed to our neural network.
+
