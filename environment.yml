@@ -15,4 +15,3 @@ dependencies:
   - libsndfile
   - pip:
       - -r requirements.txt
-prefix: /Users/jayaprakashsivagami/Documents/Tech/ML/envs/nlp

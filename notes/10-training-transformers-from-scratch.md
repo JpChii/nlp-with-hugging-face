@@ -1,6 +1,6 @@
 # Training transformers from scratch
 
-* 📝To train large model with billions of paramters, we need special tools for distributed training... Training a model of this capacity requried multiple GPU's'
+📝To train large model with billions of paramters, we need special tools for distributed training... Training a model of this capacity requried multiple GPU's'
 
 📝Choosing between training or fine-tuning depends on two things?
 
@@ -143,12 +143,396 @@ To upload files to huggingface_hub refer page 692 to 696.
 
 * Now we've a dataset, next we've to efficiently process the data to feed it to the model
 * *Can we use tokenizers like in previous notebooks?* -- **No** Because the tokenizers have their preprocessing pipeline for a specific domain or dataset. We've to consider the domain and preprocessing of an Tokenizer(from huggingface) before using it.
-* Some pitfalls of using a Tokenizer without understading it's inner workings:
+* Some pitfalls of using a Tokenizer without understading it's inner workings or tokenizer prepared for another dataset, training can be suboptimal:
     1. If we use T5 tokenizer trained on C4 corputs, we'll never see common English words like "sex." Since it used an extensive stopword filtering to create the dataset.
     2. If we use CamemBERT tokenizer which is trained on French subset of OSCAR corpus, it will be unaware of English words.
 * Due to these concers, we've to stick with same preprocessing design choices selected for pretraining. Otherwise the model may be fed out-of-distribution patterns or unkown tokens.
 
 > Training a tokenizer doesn't involve backpropogation or weights like training a model. It's a way to create a optimal mapping of string of text to a list of integers that can be ingested to a model. In today's tokenizers the optimal sstring to integer conversion involves:
     1. A list of atomic strings vocabulary
-    2. A method to cut, nromaalize or map a text string into a list of indices with this vocabulary. This is then fed to our neural network.
+    2. A method to cut, normalize or map a text string into a list of indices with this vocabulary. This is then fed to our neural network.
 
+### The Tokenizer Model
+
+The tokenizer pipeline consists of four steps, The third step tokenizer model uses sub word alogrithms to determine the vocabulary using data corpus. There are several sub word alogrithms like BPE, Unigram, WordPiece.
+
+* *BPE* Vocabulary creation:
+    1. Starts with basic units(single characters)
+    2. Merges most frequently occuring basic units to create new tokens
+    3. Adds them to vocabulary
+This process is reiterated until defined vocabulary size is reached
+
+* *Unigram* Vocabulary creation:
+    1. Starts with all words and potential subwords from corpus
+    2. The removes or splits the less useful tokens to reduce vocabulary size
+Repeats step 2 until target vocabulary search is reached.
+
+* *Wordpiece* is a predecessor of unigram and its official implementation was never open-source to google.
+
+### Measuring Tokenizer Performance
+
+The optimality and performance of a tokenizer are challenging in practice. Some possible metrics include:
+
+* *Subword fertility* -> Calculates the average number of subwords produced per tokenized word
+* *Proprtion of continued words* -> Proportion of tokenized words in a corpus that is split into at least two subtokens
+* *Coverage metrics* -> Proportion of Unkown words or rarely used tokens in a tokenized corpus
+
+In addition robustness to mispelling or noise as well as models performance on out-of-domain examples.
+
+These metrics give a different view but ignores the interaction with the model. For example subword fertility can be increased by including all tokenized words but this increases the overall vocabulary for the model.
+
+In the end, performance of a tokenizer depends on the model downstream task. For instance, the good performance of early approaches was demonstrated by showing improved performance of machine translation tasks by models trained using these tokenizers and vocabularies instead of character or word based tokenization.
+
+### A Tokenizer for python
+
+A natual language tokenizer will split the code based on whitespace, underscore, punctutations etc... This will not be good for python tokenizer. Considering the python languages:
+    * Splitting based on whitespace will lose all indentation informations
+    * undserscore will split variable names or functions
+    * Punctuations will split . notation method call
+
+We need a tokenizer that preservers space, so a good candidate could be a byte-level tokenizer like the one from GPT-2. Let's load this tokenizer and explore its tokenization properties.
+
+> **Note:** Python has an inbuilt *tokenize* model that splits Python code strings into meaningful units(code operation, comments, indent and dedent, etc.). But this pretokenizer is python-based and such is typically rather slow and limited to python GIL. On the other hand, most of the tokenizers in Transformers library are provided by the Tokenizer library and coded in Rust. Rust tokenizers are many orders of magnitude faster to train and use. These are more suited for large corpus like in our case,
+
+To understand the Output of GPT-2 tokenizer, text to byte level to unicode, building a vocablary, training a custom tokenizer. Refere to `Understanding the output`, `Training Tokenizer` section in notebook.
+
+## Training a Model from Scratch
+
+In this section, we'll cover below:
+
+1. Architecture for the task
+2. Loading a fresh model without pretrained weights
+3. Custom data loading class
+4. Scalabale training loop
+
+> Since this code is a script setup to run on distributed infrastructure, Colab(free tier) or my machine doesn't have enough compute to run the code. Hence we'll be covering all the code in this itself instead of a jupyter notebook. The tip from book also suggests to run it as a script instead of running it as seperate cells with Accelerate. [Source scripts](https://github.com/huggingface/transformers/tree/main/examples/research_projects/codeparrot)
+
+### A Tale of Pretraining Objectives
+
+Now that we've access to a large corpus, an efficient tokenizer, we can start thinking about how to pretrain a tokenizer model. With such large corpus, we can tackle several tasks. Which one we choose will determine our choice of pretraining objectives. Let's have a look at three common tasks:
+
+#### Casual Language Modeling
+
+Casual langauge modeling objective is to predict next token or character give a context in conversational or informal style. This is self-supervised training objective where we can use a dataset without annotations. A directly related downstream task is autocompletion. A decoder-only architecture such as GPT family of models is best suited for this task.
+
+#### Masked Language Modeling
+
+Masked language modeling objective is to reconstruct the original sample give a sample with replaced or masked tokens. This is also a self-supervised training objective and called as denoising objective. It's harder to think about downstream tasks but mlm denoising is generally a good pretraining task to learn general representations for later downstream tasks. Models like BERT, XLM-RoBERTa pretaining objective is mlm or denoising.
+
+#### Sequence-to-sequence training
+
+An alternative is to use heuristic like regular expressions to seperate code, comments. Use code, comments as input, labels to train a seq-to-seq model to translate code to comment and vice versa. Provided a clean, diverse. large dataset and a model with sufficient capaciity, we can train this model. This a *supervised learning* inputs, labels. In this translation of sequences, we can use encoder-decoder models like T5, BART, and PEGASUS.
+Relative downstream tasks include code generation, documentation generation.
+
+Since we want to build a autocompletion model, we'll select the first objective and choose a GPT architecture for the task. So let's initalize a fresh GPT-2 model!
+
+### Initializing the model
+
+This is the first time in the sequence of notebooks, we'll use `from_pretrained()` to intialize a new model instead of loading a model. We'll load the configuration of `gpt2-xl` so we can use the same hyperparameters with changing the vocab size alone. Then initialize a new model using this config `from_config()`.
+
+```Python
+from transformers import AutoConfig, AutoModelForCasualLM, AutoTokenzier
+
+tokenizer = AutoTokenizer.from_pretrained("transfrormers/codeparrot")
+config = AutoConfig.from_pretrained("gpt2-xl", vocab_size=len(tokenizer))
+model = AutoModelForCasualLM.from_config(config)
+```
+
+This is a 1.5B parameter model! This is a lot of capacity but we also have a large dataset. *In generatl LLM are more efficient to train as long as the dataset is reasonably large*. Larger dataset, complex model no underfitting, This follows the regular principle of underfitting and overfitting.
+
+We'll start with smaller version to train and make sure everything works before scaling up. we'll use standard GPT-2 size s base:
+
+```Python
+tokenizer = AutoTokenizer.from_pretrained("transfrormers/codeparrot")
+config_small = AutoConfig.from_pretrained("gpt2", vocab_size=len(tokenizer))
+model_small = AutoModelForCasualLM.from_config(config_small)
+```
+
+The number of paramaeters in this model is 110.0M parameters.
+
+Now we've two trainable models. We've to make sure we can feed them input data efficiently during training.
+
+### Implementing the Dataloader
+
+To be able to train with maximal efficieny, we will want to supply the our model with sequences filling its context. For example if the context length of our model is 1024 tokens, we always want to provide 1024 sequences during training. But we've to pad short code sequences or truncate long code sequences. Padding will require addition of padding tokens plus masking to avoid training for pad tokens. This requires more compute, we're more compute constrained than data constrained, so we'll take the easy and efficient way here. We'll tokenize several examples and concatenate them, seperated by eos token to get a very long sequence. Finally we split this sequence into equally sized chunks. With this approach we'll lose a small fraction at the end and don't create a bias by cutting off majority of file endings.
+
+![sequence creation](../notes/images/10-training-transformers-from-scratch/casuallm-sequence-prepation.png)
+
+We can for instance, make sure we have roughly one hundred full sequences in our tokenized examples by defining our input string character length as:
+
+input_characters = number_of_sequences * sequence_length * characters_per_token
+
+where:
+
+* `input_characters` -> number of characters in the string input to our tokenizer.
+* `number_of_sequenes` -> number of truncated sequences to be tokenized.
+* `sequence_length` -> number of tokens per sequence returned by tokenizer.
+* `characters_per_token` -> average number of characters per output that we first need to estimate
+
+If we input a string with `input_characters`, we'll get an averge of `number_of_sequences` output sequences. We can calculate the data lost by truncating the last sequence. If `number_of_sequences=100` it means we stack roughly 100 sequences and at most lose the last element, this corresponds to at most losing 1% of our dataset. This approach alos ensures a bias by cutting off the majority of file endings.
+
+How to estimate the average character length per token on our dataset:
+
+```Python
+examples, total_characters, total_tokens = 500, 0, 0
+dataset = load_dataset('transformers/codeparrot-train', split='train')
+
+for _, example in tqdm(zip(range(examples), iter(dataset)), total=examples):
+    total_characters += len(example['content'])
+    total_tokens += len(tokenizer(example['content']).tokens())
+characters_per_token = total_characters / total_tokens
+```
+
+With that we have all that's needed to create our own `IterableDataset`(PyTorch helper class) to provide constant-length inputs for the model. To do this we'eve to inherit the class nad implement the logic discussed in `__iter__()` that yields next element.
+
+```Python
+import torch
+from torch.utils.data import IterableDataset
+
+class ConstantLengthDataset(IterableDataset):
+
+    """
+    A iterable generator class to yield constant length sequences
+    """
+
+    def __init__(
+        self,
+        tokenizer,
+        dataset,
+        seq_length=1024,
+        num_of_sequences=1024,
+        chars_per_token=3.6
+    ):
+        """
+        tokenizer(Tokenizer): Tokenizer to tokenize the sequences
+        dataset (datasets): Dataset to be used
+        seq_length (int): Defaults to 1024. Context length of the model
+        num_of_sequences (int): Defaults to 1024. Number of sequences to yield by Iterator
+        chars_per_token (int): Defaults to 3.6 for the codeparrot dataset
+        """
+
+        self.tokenizer = tokenizer
+        # Token to place between sequences
+        self.concat_token_id = tokenizer.eos_token_id
+        self.dataset = dataset
+        self.seq_length= seq_length
+        self.input_characters = seq_length * chars_per_token * num_of_sequences
+
+    def __iter__(self):
+        iterator = iter(self.dataset)
+        more_examples = True
+        while more_examples:
+            buffer, buffer_len = [], 0
+            while True:
+                if buffer_len >= self.input_characters:
+                    message =f"Buffer full: {buffer_len}>={self.input_characters:.0f}"
+                    print(message)
+                    break
+                try:
+                    message=f"Fill buffer: {buffer_len}<{self.input_ccharacters:.0f}"
+                    print(message)
+                    buffer.append(next(iterator)["content"])
+                    buffer_len += len(buffer[-1])
+                # To catch when no example is left in iterator
+                except StopIteration:
+                    # Reset the iterator to iterate from beginning
+                    iterator = iter(self.dataset)
+
+            # When buffer_len == self.input_characters
+            all_token_ids = []
+            # Convert list of sequences to tokens using tokenizer
+            tokenized_inputs = self.tokenizer(buffer, truncation=False)
+            # Access input_ids of each sequence and add it to a single like like sequence_0 + eos + sequence_2 + eos ....
+            for tokenized_input in tokenized_input["input_ids"]:
+                all_token_ids.extend(
+                    tokenized_input +
+                    [self.concat_token_id] # eos token to identify end of input sequence
+                )
+            
+            # Loop through all token ids of num_of_sequences sequences from o to last token_id with a step of seq_length
+            # And yield sequences one by one
+            for i in range(0, len(all_token_ids), self.seq_length):
+                input_ids = all_token_ids[i:i+seelf.seq_length]
+                if len(input_ids) == self.seq_length
+                yield torch.tensor(input_ids)
+```
+
+Here padding, masking is not required, as we've provide sequences of the same(maximal) length and reuturn `input_ids` alone.
+
+We can use the below code to validate the DatasetIterator and sequences are of maximum length.
+```Python
+# Setting buffer size allows to shuffle the examples in buffer instead of shuffling the entire dataset.
+# As this is an iterable dataset
+shuffled_dataset = dataset.shuffle(buffer_size=100)
+constant_length_dataset = ConstantLengthDataset(tokenizer, shuffled_dataset,
+                                                num_of_sequences=10)
+dataset_iterator = iter(constant_length_dataset)
+
+lengths = [len(b) for _, b in zip(range(5), dataset_iterator)]
+print(f"Lengths of the sequences: {lengths}")
+```
+
+With this reliable data source for the model, it's time to build the actual training loop.
+
+## Define the Training Loop
+
+One obvious limitation with training our own language model is the memory limitations with GPU or even on a modern graphic card, we can't train a model at GPT-2 scale in reasonable time. In this notebook, we'll implement *data parallelism* to utilize several GPU's for training.
+
+***Accelerate*** library can be used to make our code scalable.
+
+The Accelerate library is designed to make distributed training --- and chanding underlying hardware for training easy. We can also use `Trainer` for distributed training but Accelerate gives full control over training loop which we want to explore here.
+
+We only have to make handful of changes to native PyTorch training loop to use Accelerate. Accelerate provides an easy to use API to make training scripts run with mixed precision and in any kind of distributed setting(single GPU, multiple GPUs and TPUs).
+
+```Python
+# Accelerate code changes on native PyTorch training loop
+import torch
+import torch.nn.Functional as F
+from datasets import load_dataset
+from accelerate import Accelrator
+
+# device = 'cpu'
+accelerator = Accelrator()
+
+# model = torch.nn.Transfomer().to(device)
+model = torch.nn.Transformer()
+
+optimizer = torch.optim.Adam(model.parameters())
+dataset = load_dataset("dataset_name")
+dataloader = torch.utils.data.DataLoader(dataset, shuffle=True, batch=True)
+
+model, optimizer, dataloader = accelerator.prepare(model, optimizer, dataloader)
+
+# Put model to training model
+model.train()
+
+for epoch in range(10):
+    for source, targets in data:
+        # source = source.to(device)
+        # target = target.to(device)
+        output = model(source)
+        optimizer.zero_grad()
+        loss = F.cross_entropy(outputs, targets)
+        # loss.backward()
+        accelerator.backward(loss)
+        optimizer.step()
+```
+
+The core part of the changes is `prepare()` which prepares model, otpimizer, dataloders for training on distributed infrastructure. These minor changes helps us to scale training across different infrastructures. With that in mind, let's start building our training script and define a few helper functions. First we set up the hyperparameters for training and wrap them in a `Namespace` for easy access.
+
+```Python
+from argparse import Namespace
+
+config = {
+    "train_batch_size": 2,
+    "valid_batch_size": 2,
+    "weight_decay": 0.1,
+    "shuffle_buffer": 1000,
+    "leraning_rate": 2e-4,
+    "lr_scheduler_type": "cosine",
+    "num_warmup_steps": 750,
+    "gradient_accumulation_steps": 16,
+    "max_train_steps": 50000,
+    "max_eval_steps": -1,
+    "seq_length": 1024,
+    "seed": 1,
+    "save_checkpoint_steps": 50000
+}
+args = Namespace(**config)
+```
+
+Since we're gonna train the model from scratch it's gonna take a while and require expensive infrastructure. Therefore, we want to make sure all the relevant information is stored and easily accessible. We'll setup three levels of logging: 
+    1. Python Logger
+    2. TensorBoard
+    3. Weights & Biases
+
+Depending on preference we can add or remove logging frameworks here.
+
+```Python
+from torch.utils.tensorboard import SummaryWriter
+import logging
+import wandb
+
+def setup_logging(project_name):
+    logger = logging.getLogger(__name__)
+    logging.basicConfig(
+        format="%(asctime)s - %(levelname)s - %(name)s - %(message)s",
+        datefmt="%m/%d/%Y %H:%M:%S",
+        level=logging.INFO,
+        handlers=[
+            logging.FileHandler(f"log/debug_{acceleartor.process_index}.log"),
+            logging.StreamHandler()
+        ]
+    )
+
+    # Main worker
+    if accelrator.is_main_process: # setup logging once only
+        # To track experiments
+        wandb.init(
+            project=project_name, #Project name for wandb
+            config=args, # Arguments to track
+            )
+        run_name = wandb.run.name
+        # To track hyperparameters
+        tb_writer = SummaryWriter()
+        tb_writer.add_hparams(vars(args), {'0': 0})
+        logger.setLevel(logging.INFO)
+        datsets.utils.logging.set_verbosity_debug()
+        transformers.utils.logging.set_verbosity_info()
+
+    # Other workers
+    else:
+        tb_writer = None
+        run_name = ''
+        logger.setLevel(logging.ERROR)
+        datasets.utils.logging.set_verbosity_error()
+        transformers.utils.logging.set_verbosity_error()
+    return logger, tb_writer, run_name
+```
+
+Each worker gets a unique `acceleartor.process_index` which we'll use to store logs from different workers to diferent files. `accelrator.is_main_process` is True for main worker alone, we use this to set higher level logs for main worker alone and lower(less) level logs for other workers. We also make sure the logger is init only once.
+
+Next, a helper function to log the metrics with TensorBoard and Weights&Biases. We'll again use `accelrator.is_main_process` here to ensure that we only log the metrics once and not for each worker.
+
+```Python
+def log_metrics(step, metrics):
+    logger.info(f"Step {step}: {metrics}")
+    if accelrator.is_main_process:
+        wandb.log(metrics)
+        [tb_writer.add_scalr(k,v,step) for k, v in metrics.items()]
+```
+
+Next, a function to create dataloder for training and validation sets with `ConstantLengthDatset` class:
+
+```Python
+from torch.utils.data.dataloder import DataLoader
+
+def create_dataloaders(dataset_name):
+    train_data = load_dataset(dataset_name+'-train', split="train", streaming=True)
+    train_data = train_data.shuffle(buffer_size=args.shuffle_buffer, seed=args.seed)
+    valid_data = load_dataset(dataset_name+'-valid', split="validation", streaming=True)
+    train_dataset = ConstantLengthDataset(tokenizer, train_data, seq_length=args.seq_length)
+    valid_dataset = ConstantLengthDataset(tokenizer, valid_data, seq_length=args.seq_length)
+
+    train_dataloader = DataLoader(train_dataset, batch_size=args.train_batch_size)
+    eval_dataloader = DataLoader(valid_dataset, batch_size=args.valid_batch_size)
+    return train_dataloader, eval_dataloader
+```
+
+At the end we wrap the dataset with DataLoader, which provies batching, shuffling, prefetch(fetching next set of samples), augumentation etc. Accelerate will take care of distributing the batches to each worker.
+
+We'll define the optimizer and learning rate schedule in the main loop. Next we'll define a helper to differentiate parameters that should recieve weight decay. LayerNorm(normalizing distributions), bias(shift or offset) doesn't need reugularization.
+
+```Python
+def get_grouped_params(model, no_decay=["bias", "LayerNorm.weight"]):
+    params_with_wd, params_without_md = [], []
+    for n, p in model.named_parameters():
+        if any (nd in n for nd in no_decay):
+            params_without_wd.append(p)
+        else:
+            params_with_wd.append(p)
+    return [
+        {"params": params_with_wd, "weight_decay": args.weight_decay},
+        {"params": params_without_wd, "weight_decay": 0.0}
+    ]
+```

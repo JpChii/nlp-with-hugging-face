@@ -20,7 +20,7 @@ This step corresponds to the set of operatins applied to make it `cleaner`. Some
     - Is a normalization applied by many tokenizers to deal with the fact that there are many ways to write the same character.
     - This can make two versions of same string appear different.
     - This uses schemes like NFC, NFD, NKFC and NFKD replace the ways to write the same character with standard forms.
-4. Lowecasing
+4. Lowercasing
     - If the model accpets and uses only lowecase, this will reduce the size of the vocabulary
 
 After normalization the text would look like,
@@ -42,7 +42,16 @@ After pretokenization,
 * Reduce the size of the vocabulary and number of out-of-vocabulary tokens.
 * Serveral subword tokenization algorithms exist
     - BPE
+        * *BPE Vocabulary creation:*
+                1. Starts with basic units(single characters)
+                2. Merges most frequently occuring basic units to create new tokens
+                3. Adds them to vocabulary
+            This process is reiterated until defined vocabulary size is reached
     - Unigram
+        * *Unigram Vocabulary creation*:
+                1. Starts with all words and potential subwords from corpus
+                2. The removes or splits the less useful tokens to reduce vocabulary size
+            Repeats step 2 until target vocabulary search is reached.
     - WordPiece[BERT]
         Uses [CLS] and [SEP] tokens to indicate start and end of text
     - Sentence-Piece[XLMRoBERTa]
