@@ -536,3 +536,173 @@ def get_grouped_params(model, no_decay=["bias", "LayerNorm.weight"]):
         {"params": params_without_wd, "weight_decay": 0.0}
     ]
 ```
+
+Finally, we want to evaluate the model on validation set from time to time, let's create an evaluation function that calculates the loss and perplexity on evaluation set:
+
+```Python
+def evaluate():
+    model.eval()
+    losses = []
+    for step, batch in enumerate(eval_dataloader):
+        with torch.no_grad():
+            outputs = model(batch, labels=batch)
+        loss = outputs.loss.repeat(args.valid_batch_size)
+        losses.append(accelerator.gather(loss))
+        if args.max_eval_steps > 0 and step >= args.max_eval_steps: break
+    loss = torch.mean(torch.cat(losses))
+    try:
+        perplexity = torch.exp(loss)
+    except OverflowError:
+        perplexity = torch.tensor(float("inf"))
+    return loss.item(), perplexity.item()
+```
+
+The perplexity measures how well the model's output probabality distributions predicts the targeted tokens. Perplexity is exponent of cross entropy loss. Lower perplexity -> good performance. When the loss is still high at the start of training numerical overflow might occur with perplexity calculation. We catch the overflow and set perplexity to infinity in these instances.
+
+One last function to push model checkpoints to hugging face hub during training. With `Repository` class we can do this programatically. Since hub uses Git under the hood, we can do pull, push, branch, commit etc.
+
+Here comes the complete training script:
+
+```Python
+# Setting seed to maintain same randomness in every run
+set_seed(args.seed)
+
+# Accelerator for distributed training
+accelerator = Accelerator()
+samples_per_step = accelerator.state.num_processes * args.train_batch_size # Number of samples required for every step
+
+# Logging
+logger, tb_writer, run_name = setup_logging(project_name.split("/")[1])
+logger.info(accelerator.state)
+
+# Load dataset, dataloader
+train_dataloader, eval_dataloader = create_dataloders(dataset_name)
+
+# Prepare the optimizer and learning rate scheduler
+optimizer = AdamW(get_grouped_params(model), lr=args.learning_rate)
+lr_scheduler = get_scheduler(
+    name=args.lr_scheduler_type,
+    optimizer=optimizer,
+    num_warmup_steps=args.num_wamup_steps,
+    num_training_steps=args.max_train_steps,
+)
+
+def get_lr():
+    return optimizer.param_groups[0]["lr"]
+
+# Prepare everything with accelerator
+model, optimizer, train_dataloader, eval_dataloader = accelerator.prepare(
+    model, optimizer, train_dataloader, eval_dataloader,
+)
+
+# Train model
+model.train()
+completed_steps = 0
+for step, batch in enumerate(train_dataloder, start=1):
+    loss = model(batch, labels=batch).loss
+    log_metrics = (
+        step, {"lr": get_lr(), "samples": step*samples_per_step, "steps": completed_steps, "loss/train": loss.item()}
+    )
+    loss = loss / args.gradient_accumulation_steps
+    accelerator.backward(loss)
+
+    if steps % args.gradient_accumulation_steps == 0:
+        optimizer.step()
+        lr_scheduler.step()
+        optimizer.zero_grad()
+        completed_steps += 1
+    if step % args.save_checkpoint_steps == 0:
+        logger.info("Evaluating and saving model checkpoint")
+        eval_loss, perplexity = evaluate()
+        log_metrics(step, {"loss/eval": eval_loss, "perplexity": perplexity})
+        accelerator.wait_for_everyone()
+        unwrapped_model = accelerator.unwrap_model(model)
+        if accelerator.is_main_process:
+            unrapped_model.save_pretrained("./")
+            hf_repo.push_to_hub(commit_message=f"step {step}")
+        model.train()
+    if completed_steps >= args.max_train_steps: 
+        break
+
+# Evaluate and save the last checkpoint
+logger.info('Evaluating and saving model after training')
+eval_loss, perplexity = evaluate()
+log_metrics(step, {'loss/eval': eval_loss, 'perplexity': perplexity})
+accelerator.wait_for_everyone()
+unwrapped_model = accelerator.unwrap_model(model)
+if accelerator.is_main_process:
+    unwrapped_model.save_pretrained("./")
+    hf_repo.push_to_hub(commit_message=f'final model')
+```
+
+![alt](../notes/images/10-training-transformers-from-scratch/distributed-training.png)
+
+Let's walk thorugh the code block and highlight the most important parts:
+
+*Model saving:*
+
+* The script is run within the model repository.
+* We use the run_name from wandb to create a new branch for each experminent and every commit is a checkpoint.
+* We need to call `wait_for_everyone()` and `unwrap_model()` to make sure the model is properly synchronised when we store it.
+
+*Optimization:*
+
+* For model optimization we use `AdamW` with a cosine learning rate scheduler after a linear warming-up period.
+* For hyperparams, we closley follow the parameters described in the gpt-3 paper for similar sized models.
+
+*Evaluation:*
+
+* At every save_checkpoint, we evaluate the model with evaluation data and save the model with validation loss and perplexity.
+
+*Gradient accumulation and checkpointing:*
+
+* With larger models, we can't even fit a single batch on latest GPU's.
+* So we accumulate gradients over certain steps and perform optimization and step. 
+* We can do this with `Trainer` as well.
+* This method is called *gradient checkpointint* we can trade some of the memory footprint for an approximatley 20% training slowdown.
+
+We still don't know how accelerate performs distributed training. It uses [Distributed data parallelism](https://pytorch.org/tutorials/intermediate/ddp_tutorial.html) to train models faster with larger batch size that wouldn't fit into any single GPU.
+
+![alt](../notes/images/10-training-transformers-from-scratch/distributed-training.png)
+
+Let's go throught the pipeline step by step:
+
+1. Each worker consists of a GPU. In Accelerate, there is a dataloder running on the main process that prepares batches of data and sends them to all workers.
+2. Each worker performers forward, backward pass and accumulates gradients with a local copy of the model.
+3. The gradients from each node are averaged with the *reduce* pattern and sent back to each worker.
+4. The gradients are updated with optimization step at each workers. This avoids the copying of model between workers and the wait time during copy is avoided.
+5. Once all models are updated, we start all over agin with the main worker preparing new batches.
+
+This simple pattern allows us to train extremley large models extremley fast by scaling up the number of available GPU's without much additional logic. Sometimes the model might not fit inside a single GPU, we need more sophisticated parallelism strategies.
+
+## The Training Run
+
+Since hub repos are essential github repos we can add our training script and requirements.txt to hub repo. Then with the below commands we can perform the training run:
+
+```zsh
+git clone <hugging face repo link>
+cd repo
+pip install -r requirements.txt
+wandb login
+accelerate config
+accelerate launch training_script.py
+```
+
+wandb login -> provide wandb creds
+accelerate config -> to setup infrastructure
+
+This code_parrote experiment uses 16 A100 GPUs with 40GB memeory each.
+
+Running the training script takes 24 hours and 7 days for small and large models respectivley. Since the infrastructure is expensive and time taken is large, it's best to try out the script in smaller infra before scaling up the run.
+
+Once the run is exompleted we can merge the experiment branch on the Hub using git commands.
+
+## Results and analysis
+
+For results and analysis i'll do a quick brief.
+our task is code autocompletions, so evaluation of model will be based on that.
+We can do qualititaive(differnt tasks) and quantitative(over a large set of examples) tests.
+BLEU can be used to evaluate text genration but the way of writing code(variables, functions, classes) vary between human coders, but BLEU score is based n-grams in original vs n-grams in prediction which will be bad for this task.
+The better evaluation will be to write test cases, generate code and test them against test cases.
+
+For more details on this section refer the book(got a little tired at the end and excited to try out the learning from this series).
