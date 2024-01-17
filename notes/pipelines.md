@@ -43,3 +43,13 @@ out = pipe(sample_text)
 ```
 
 `summary_text` will've the summarized output.
+
+# 3. Question Answering
+
+We can use any qa checkpoint(from deepset or others) and use this pipeline to get answers.
+
+```Python
+from transformers import pipeline
+pipe = pipeline("question-answering", model=model, tokenizer=tokenizer)
+pipe(question=question, context=context, topk=3)
+```

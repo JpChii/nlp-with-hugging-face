@@ -7,4 +7,5 @@
 7. Establish a baseline
 8. Calculate metrics for baseline
 9. Fine tune model
+    * For fine tuning always start with a small model to iterate quickly to do the setups
 10. Error analysis

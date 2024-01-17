@@ -1,12 +1,12 @@
 # Question Answering
 
-Irrespective of profession, everyone has to wade through ocean of documents at some point to find the information for their questions.  To make matters worse, we're constantly reminded by search engines there are better ways to search! For instance the earch query "When did Marie Curie win her first Nobel Prize?" And google get the correct answer of "1903".
+Irrespective of profession, everyone has to wade through ocean of documents at some point to find the information for their questions.  To make matters worse, we're constantly reminded by search engines there are better ways to search! For instance the each query "When did Marie Curie win her first Nobel Prize?" And google get the correct answer of "1903".
 
 So how was this search done? Google first retrieved 319,000 documents that were relevant to query, then performed a post processing step to extract the answer snippet with the coressponding passage and web page. But for a more trickier question like "Which guitar tuning is best?" We'll get web pages instead of an answer snippet.
 
 The general approach behind this technology is called *question answering*(QA), but the most common is *extractive QA* which involves questions where answers can be identified as a span in a text document, where the document might be a web page, article, legal document etc.
 
-This two stage process of retrieving relevant documents and then extracting answers from this is the basis of many modern QA systems like semantic search, intellegint assistants and automated information extractors. 
+This two stage process of retrieving relevant documents and then extracting answers from them. This is the basis of many modern QA systems like semantic search, intelligent assistants and automated information extractors. 
 
 > **Note:** We're covering only extractive QA. There are others,
  * community QA Ex: In stack overflow, all the relevant question answer pairs will be retrived for the new Question from user and then using semantic similarity search to find the closest maching answer to this question.
@@ -15,9 +15,9 @@ This two stage process of retrieving relevant documents and then extracting answ
 
 ## Question Answering Dataset history
 
- The (question, review, [answer setences]) format of SubjQA(used in ![7-question-answering.ipynb notebook usecase for q](../notebooks/7-question-answering.ipynb)) is commonly used in extractive QA datasets and was pioneered in Stanford Question Answering Dataset(SQuAD). 
+ The (question, review, [answer setences]) format of SubjQA(used in [7-question-answering.ipynb notebook usecase for qa](../notebooks/7-question-answering.ipynb)) is commonly used in extractive QA datasets and was pioneered in Stanford Question Answering Dataset(SQuAD). 
 
- * SQuAD is a famous dataset to test the abilit of machines(models) to read a passage of text and answer questions about it
+ * SQuAD is a famous dataset to test the ability of machines(models) to read a passage of text and answer questions about it.
  * This dataset was created from several hundred articles from wikipedia, where each of the article was partioned into paragraphs. Then crowdworkers were asked to generate questions and answers for each paragraph.
  * In the first crowdworkers version of SQuAD, answers for questions were guaranteed to be in paragraphs.
  * Soon sequence to sequence models outperformed humans and predicted spans of answers for question in the context(paragraphs, reviews etc.)
@@ -27,7 +27,7 @@ This two stage process of retrieving relevant documents and then extracting answ
 
     ![alt](../notes/images/7-question-answering/qa-sota-models.png)
 * However this superhuman performance does not appear to reflect genuine reading comprehension, since answers to these "unanswerable" questions can be found by looking at antonymns in passages. 
-* To address these problems Google released the Natural Questions (NQ) dataset which involves fact-seeking questions obtainef from Google Search users.
+* To address these problems Google released the Natural Questions (NQ) dataset which involves fact-seeking questions obtained from Google Search users.
 * The answers in NQ are much longer than in SQuAD and present a more challenging benchmark.
 
 ```
@@ -44,7 +44,7 @@ The first thing we'll need for our QA systems is to find a way to identify poten
 
 #### Frame the problem - span classification
 
-The most common way to extract answers is ny framing the problem as *Span classification task* where start and end tokens acts as lables to be predicted by the model.
+The most common way to extract answers is by framing the problem as *Span classification task* where start and end tokens acts as lables to be predicted by the model.
 
 *qa span classification*
 
@@ -63,7 +63,7 @@ Woah... 4000+ models are available, which model to use depends on mono or multi-
 |----------|----------|----------|----------|
 | MiniLM   | Distilled version of BERT-base that preserves 99% performance while being twice as fast   | 66M | 79.5 |
 | RoBERTa-base | RoBERTa models have better performance than their BERT counterparts and can be fine-tuned on most QA datastes using a single GPU | 125M| 83.0 |
-| ALBERT-XXL | SOTA on datasetm but computationally intensive and difficult to deploy | 253M | 88.1 |
+| ALBERT-XXL | SOTA on dataset but computationally intensive and difficult to deploy | 253M | 88.1 |
 | XLM-RoBERTa-large | Multilingual model for 100 languages with strong zero-shot performance | 570M | 83.8 |
 
 ### Inputs format
@@ -84,6 +84,8 @@ In transformers, we can set `return_overflowing_tokens=True` in the tokenizer to
 * From second window, move back by stride_length from previous window's end token, this is the starting point of curent window and spans the length of max_length. This process is repeated until the sequence ends.
 * All the windows overlap with previous window by stride length.
 
+*How does the sliding window data goes into model, how the predictions are post processed to get answers? -> [refer this](https://github.com/huggingface/notebooks/blob/main/examples/question_answering.ipynb)*
+
 
 ### Using Haystack to Build a QA pipeline
 
@@ -93,7 +95,7 @@ In our example above, we've fed the pipeline or model both question and context.
 
 Simple and easiest approach is to concatenate all the reviews available as a single context and feed it with question to the model. The bottleneck will be the computation to process, because the context is big due to concatenation. Let's assume it takes 100 milliseconds to process a review with 30 reviews and the model will take 3 seconds latency after users input which won't work in an ecommerece application.
 
-To overcome this, moder QA system uses retriever-reader approach:
+To overcome this, modern QA system uses retriever-reader approach:
 
 #### Retriever-Reader architecture
 
@@ -106,7 +108,7 @@ Retriever is responsible for retrieving relevant documents for the user query. T
 
 ##### Reader
 
-Responsible for extracting an answer from the documnts provided by the retriver. These can be reading comprehension models(extract answers from text) or free-form answers from generative tranformers.
+Responsible for extracting an answer from the documents provided by the retriver. These can be reading comprehension models(extract answers from text) or free-form answers from generative tranformers.
 
 There can be post-processing after retriver or reader and both as well. Like ranking the documents from retriever to remove noisy passages or postprocessing answer by combining answer from various passages in a long document.
 
@@ -114,13 +116,13 @@ There can be post-processing after retriver or reader and both as well. Like ran
 
 ![alt](../notes/images/7-question-answering/qa-modern-architecture.png)
 
-To buld our QA system, we'll use the [Haystack library](https://haystack.deepset.ai/) developed by [deepset](https://deepset.ai/). Haystack is based on retriever-reader architecure and tighty coupled with transformers to abstract away the complexity in building these systems.
+To build our QA system, we'll use the [Haystack library](https://haystack.deepset.ai/) developed by [deepset](https://deepset.ai/). Haystack is based on retriever-reader architecure and tighty coupled with transformers to abstract away the complexity in building these systems.
 
-In addition to retriever and reader an QA system requries two more components:
+In addition to retriever and reader an QA system requires two more components:
 
 ##### Document store
 
-A document-oriented database that stors documents and metadata which are provided to the retriever at query time
+A document-oriented database that stores documents and metadata which are provided to the retriever at query time
 
 ##### Pipeline
 
@@ -132,7 +134,7 @@ For an implementation of document store, retriever, reader refer the respective 
 
 ## Improving QA Pipeline
 
-> **Note:** Irrespective of recent research on QA has focused on readin comprehnsion models, the performance of QA will be bad if the retriever can't find the relevant documents for the query. Retriever set's an upper bound on the performance of reader(reading comprehension models). With this in mind let's look at some common metrics to evaluate the retriever so that we can compare the performance of sparse and dense representations.
+> **Note:** Irrespective of recent research on QA has focused on reading comprehnsion models, the performance of QA will be bad if the retriever can't find the relevant documents for the query. Retriever set's an upper bound on the performance of reader(reading comprehension models). With this in mind let's look at some common metrics to evaluate the retriever so that we can compare the performance of sparse and dense representations.
 
 For developing a good QA system, we can go throught the below steps,
 
@@ -149,7 +151,7 @@ A common metric for evaluating the retriever is *recall*, which measure the frac
 
 10 top_k documents, answer appers in 8 of them, recall will be 80%.
 
-In Haystackm there are two ways to evaluate retrievers:
+In Haystack there are two ways to evaluate retrievers:
 
 * Retrievers built in `eval()` method. This can be used for both open and closed-domain QA. But for dataset like QA where each document is paired with a product and needs to be filterd by Product id for every query.
 
@@ -166,3 +168,69 @@ A binary metric that gives EM=1 if the characters in the predicted and ground tr
 Harmonic mean of precision and recall.
 
 Let's see how these metrics wit some helper functions from FARM over a simple example.
+
+# Quick Notes:
+
+QA models are reading comprehension models, which needs to understand the context, question to identify the span(extractive qa) answers in context or geneate answers(long from qa) answers based on context, grounded in context.
+
+In general QA models can be classified based on the domain:
+    * If it's for a single product, less documents to retrive. This is called Narrow QA
+    * If it's for all kinds of products(amazon,flipkart), more documents to retrieve. This is called Open QA.
+
+Based on machine learning problem:
+    * Span classification - Extrative QA
+    * Text generation - Long form QA
+
+Community QA belongs to both of these.
+
+There are few benchmark datasets for QA models. They are:
+    1. NQ by google
+    2. SQUAD 1.1
+    3. SQUAS 2.0
+
+*QA system:*
+
+The QA models require context and question to predict results.
+
+Query comes from user, where does the context comes from? This should be from our corpus.
+
+*Is it okay to use the entire corpus as context:*
+    If it's like 5 documents then it's fine. What if we've thousands or millions of documents?
+
+    Using all of them and feeding it to model, the prediction will take a long time. Will the user be patient enough for such a long time? NO, so we need a retriever system to retrieve documents or articles or web pages from our corpus based on the user query.
+
+    The retrieval can be based on metadata filtering like:
+        1. domain
+        2. product
+        3. keywords
+
+    Or based on semantic similarity of query with context. This can be built using a retriever model. Check the semantic representations, similarity scores between queries and context before this approach. This is our vector store or document store to retrieve documents based on the query.
+
+    There are different types of retrievrs available.
+
+*Data EDA:*
+
+* visualize the dataset
+* understand how context, question, answer, span is defined
+* Explore how many context starts with regular question words like what, how, when etc? To get an idea of the data
+* Explore the tokenized input length
+
+*Modelling:*
+
+Output of a extractive qa model:
+
+* The last layer of extractive qa model[tinyroberta, minilm from deepset] is linear layer with two logits. This is fit into QuestionAnsweringOutput class and returned.
+* In a way this is also like a token classification task. But here we are classifying span tokens. 
+* We've logits for start and end span tokens based on hidden states. This spans the length of input tokens.
+* logits_length == input_tokens_length
+
+* After getting the start and end logits, we can do a simple argmax to get the span tokens positions. This heuristic approach has some disadvantages:
+    1. This doesn't verify if the spans are coming in question itself
+    2. If end spand comes before start span
+    3. If the answer is grounded in context or not
+
+All these limitations are handled in `question-answering` pipeline.
+
+We can fine-tune a model and use the pipeline for these sophistications or write them ourselves.
+
+* visualize span logits for a few samples for getting an intution

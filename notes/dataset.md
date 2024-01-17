@@ -5,12 +5,12 @@ Hugging Face Datasets, This markdown will serve as a place to recall important p
 *Abbreviation used*
 hub --> Hugging face Hub
 
-* `load_dataset()` function can be used to load any dataset fomr hub
+* `load_dataset()` function can be used to load any dataset from hub
 * When dealing with dataset with multiple domains, we can use `get_dataset_config_names()` function to identify the subsets that are available.
 * To access a particular subset, `name`  argument with suffix name as value must be passed.
     ```Python
     # Loading PAN-X german subset from xtreme
-    from dtaasets import load_dataset
+    from datasets import load_dataset
     load_dataset("xtreme", name="PAN-X.de")
     ```
 * In each `Dataset` object, the keys correspond to column names of an Arrow table and values denote the entries in each column.

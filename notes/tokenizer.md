@@ -36,7 +36,7 @@ After normalization the text would look like,
 After pretokenization,
 `["jack", "sparrow", "loves", "new", "york","!"]`
 
-### Tokenizer model
+### Tokenizer algorithms
 
 * The model splits the words from pretokenizer into sub words.
 * Reduce the size of the vocabulary and number of out-of-vocabulary tokens.
@@ -68,8 +68,13 @@ Now text becomes like below,
 
 ## Tokenizers List
 
-* WordPiece --> BERT tokenizer
-* SentencePiece --> XLM-R tokenizer
+* BERT tokenizer --> WordPiece
+* XLM-R tokenizer --> SentencePiece
+* RoBERTa -> BPE
+* QA tokenizers
+    1. deepset tokenizers from huggingface are all qa tokenizers
+    2. QA tokenizers requires two inputs question, context
+    3. Question and context are differntiated after tokenization using token_type_ids, 0 for question tokens, 1 for answer tokens or vice versa
 
 
 ## Methods
