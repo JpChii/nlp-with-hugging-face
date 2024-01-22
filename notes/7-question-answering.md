@@ -1,5 +1,7 @@
 # Question Answering
 
+[Source notebook](../notebooks/7-question-answering.ipynb)
+
 Irrespective of profession, everyone has to wade through ocean of documents at some point to find the information for their questions.  To make matters worse, we're constantly reminded by search engines there are better ways to search! For instance the each query "When did Marie Curie win her first Nobel Prize?" And google get the correct answer of "1903".
 
 So how was this search done? Google first retrieved 319,000 documents that were relevant to query, then performed a post processing step to extract the answer snippet with the coressponding passage and web page. But for a more trickier question like "Which guitar tuning is best?" We'll get web pages instead of an answer snippet.
@@ -87,26 +89,26 @@ In transformers, we can set `return_overflowing_tokens=True` in the tokenizer to
 *How does the sliding window data goes into model, how the predictions are post processed to get answers? -> [refer this](https://github.com/huggingface/notebooks/blob/main/examples/question_answering.ipynb)*
 
 
-### Using Haystack to Build a QA pipeline
+## Using Haystack to Build a QA pipeline
 
 In our example above, we've fed the pipeline or model both question and context. But in reality we'll get only the query from user and we've get the context from our corpus. There are few ways to do it:
 
-#### Simple Approach
+### Simple Approach
 
 Simple and easiest approach is to concatenate all the reviews available as a single context and feed it with question to the model. The bottleneck will be the computation to process, because the context is big due to concatenation. Let's assume it takes 100 milliseconds to process a review with 30 reviews and the model will take 3 seconds latency after users input which won't work in an ecommerece application.
 
 To overcome this, modern QA system uses retriever-reader approach:
 
-#### Retriever-Reader architecture
+### Retriever-Reader architecture
 
-##### Retriever
+#### Retriever
 
 Retriever is responsible for retrieving relevant documents for the user query. They are categorized as sparse and dense
 
 1. *Sparse Retrievers*: This uses word frequencies to represent a document. The query is also a sparse vector. The relevancy of document for the query is determined by computing an inner product of both vectors.
 2. *Dense Retrievers*: This stores documents as contextualized embeddings. The query is converted into a dense vector using encoder like transformers. Then both query and documents are compared, semantic meaning is available with embeddings. This allows for a more accurate search of documents by understanding the content of the query.
 
-##### Reader
+#### Reader
 
 Responsible for extracting an answer from the documents provided by the retriver. These can be reading comprehension models(extract answers from text) or free-form answers from generative tranformers.
 
@@ -120,11 +122,11 @@ To build our QA system, we'll use the [Haystack library](https://haystack.deepse
 
 In addition to retriever and reader an QA system requires two more components:
 
-##### Document store
+#### Document store
 
 A document-oriented database that stores documents and metadata which are provided to the retriever at query time
 
-##### Pipeline
+#### Pipeline
 
 Combines all the components of QA system to enable custom query flows, merging documents from multiple retrievers and more.
 
@@ -132,9 +134,146 @@ Next we'll explore how to build a prototype popeline and then focus on improving
 
 For an implementation of document store, retriever, reader refer the respective notebook.
 
+### Implementation of QA Pipeline with haystack
+
+#### Initializing elastic search document store
+
+Other document stores:
+1. Memory
+2. FAISS
+3. Pinecone
+4. All other document databases like mongo etc
+
+To initialize a elastic search document store, we've to setup our elastic search instance and running. Once it's up we can initialize the `ElasticSearchDocumentStore` from `haystack.document_stores.elasticsearch` by passing elastic search instance details. 
+
+This initialization creates two indices: `documents`, `labels` to ingest documents and answer spans in respective indices. Haystack Document stores expect a list of dictionaries. Dict format requires: 
+    1. text - document or string or context
+    2. meta - a dict with other sub keys for filtering the documents(if required)
+
+After creating data in this format, we can ingest them into document store using :
+```Python
+document_store.write_documents(
+    documents=docs, index="document"
+)
+```
+
+[Alternate way to ingest files directly is to use haystack pipelines(use components like converter, splitter, embedder, writer) to directly write txt files to index.](https://haystack.deepset.ai/integrations/elasticsearch-document-store)
+
+#### Initializing a retriever
+
+We can intialize BM25(spare) retriever by Initializing the `haystack.nodes.retriever.BM25Retriever` by passing the document_store object initialized above.
+
+[BM25 algorithm in elastic search](https://www.elastic.co/blog/practical-bm25-part-2-the-bm25-algorithm-and-its-variables)
+
+```Python
+from haystack.nodes.retriever import BM25Retriever
+bm25_retriever = BM25Retriever(document_store=document_store)
+```
+
+To retrieve documents using the retriever, we can pass below parameters:
+    1. query(required) - user query
+    2. filters(optional) - to restrict the search of documents using metadata
+    3. top_k (options, but preferred) - to fetch top-k documents from document store based on query
+
+```Python
+item_id = "B0074BW614"
+query = "Is it good for reading"
+retrieved_docs = bm25_retriever.retrieve(
+    query=query,
+    top_k=3,
+    filters={
+        "item_id":[item_id],
+        "split": ["train"],
+    }
+)
+```
+
+The output is a list of `Document` objects with Lucence score. This is score of both query and fetched documents using [Lucene's practical scoring algorithm](https://www.elastic.co/guide/en/elasticsearch/guide/current/practical-scoring-function.html).
+
+* BM25 to fetch documents based on query, and above scoring to calculate a similarity score between query and documents.
+* BM25 intuitivley uses words from user query with documents to calculate the score to fetch documents from document store.
+
+#### Initializing the reader
+
+We can use FARMReader from haystack or TrasformersReader from huggingface.
+
+
+#### FARMReader
+
+Based on deepset's [FARM framework](https://farm.deepset.ai/) for fine-tuning and deploying transformers. Compatible with models trained using Transformers and can load models directly from the Hugging Face Hub
+
+#### TransformersReader
+
+Based on the QA pipeline from Transformers suitable for running inference only.
+
+#### FARMReader vs TransformerReader
+
+The handling of weights are same in the readers, but there are some differences listed below,
+
+* `TransformersReader` normalizer answers from a passage using softmax. After normalization comparing scores of answers from different passages doesn't make sense, as normalization is done based on answers in a single passage and comparison becomes irrelevant. FARM doesn't normalize the logits and inter-passage answers can be compared more easily.
+* `FARMReader` predicts same answers twice with different scores, when answer lies in two overlapping windows in a long context. In FARM these duplicates are removed.
+
+Since we'll be fine-tuning the reader later, we'll use the `FARMReader`. As with transformers we just need to specify the MiniLM checkpoint with some QA-specific arguments to initalize the reader with FARM.
+
+With FARMReader, we've to specify:
+    1. model_name
+    2. max_seq_length
+    3. doc_stride
+
+The FARMReader also uses same parameters as tokenizers to control the sliding window.
+
+We can get answers with reader like below:
+
+```Python
+reader.predict_on_texts(
+        question=question,
+        texts=[context],
+        top_k=1
+    )
+```
+
+#### Putting reader and retriever together
+
+Haystack has pipelines analagous to transformers to tie up reader and retriever together in a pipeline, but these are specialized for QA.
+
+We can also pass top_k parameters to Reader and retriever to this pipeline.
+
+ExtractiveQA Pipeline intialization and call below:
+```Python
+# Pipeline initialization
+from haystack.pipelines import ExtractiveQAPipeline
+
+pipe = ExtractiveQAPipeline(
+    reader=reader,
+    retriever=bm25_retriever,
+)
+
+# Pipeline Call
+n_answers = 3
+preds = pipe.run(
+    query=query,
+    params={
+        "Retriever": {
+            "top_k": 3,
+            "filters": {
+                "item_id": [item_id],
+                "split": ["train"]
+            }
+        },
+        "Reader": {
+            "top_k": n_answers
+            }
+        }
+)
+```
+
+The output also has lots of fields.
+
 ## Improving QA Pipeline
 
 > **Note:** Irrespective of recent research on QA has focused on reading comprehnsion models, the performance of QA will be bad if the retriever can't find the relevant documents for the query. Retriever set's an upper bound on the performance of reader(reading comprehension models). With this in mind let's look at some common metrics to evaluate the retriever so that we can compare the performance of sparse and dense representations.
+
+> If retriever performance is bad it's like searching answers for physics question in chemistry book.
 
 For developing a good QA system, we can go throught the below steps,
 
@@ -153,7 +292,67 @@ A common metric for evaluating the retriever is *recall*, which measure the frac
 
 In Haystack there are two ways to evaluate retrievers:
 
-* Retrievers built in `eval()` method. This can be used for both open and closed-domain QA. But for dataset like QA where each document is paired with a product and needs to be filterd by Product id for every query.
+* Pipelines built in `eval()` method. This can be used for both open and closed-domain QA. But for dataset like QA where each document is paired with a product and needs to be filterd by Product id for every query.
+
+To call this method:
+    1. We've to add questions, answers using `Label` object
+    2. Add them to `label` index
+    3. Aggregate the labels based on question or question id or meta field to aggreate
+    4. Then call eval with aggregated labels and retriever params
+
+Increasing top_k will improve recall, but increase the compute as well. We've to evaluate the retriever for different k values.
+
+`eval_result` of `eval()` call has `calculate_metrics()`, we can feed this `simulated_top_k_retriever` value to evaluate eval results for different top_k values.
+
+Code walkthrough for evaluation is in source notebook.
+
+* The above top_k evaluation is mainly used for BM25 retriever, which requires more documents to get better results. Due to it's nature of fetching documents from document store using words from query.
+
+#### Dense Passage Retriever
+
+Is there a way to reduce k, which will reduce latency of overall QA pipeline. One known disadvantage of sparse retrievers is it's inability to retrieve documents from query words. As an alternative, we can use dense representation to retrieve documents using query.
+
+##### DPR model
+
+Dense passage retriever model is a bi-encoder model to obtain a good score between query and passages. Out of two encoders, one is for query and another one is for passage. The training setup to reduce the loss(negative log likelyhood score for positive passages) can be used to learn embeddings to group questions and passages together in embedding dimension.
+
+Refer section 3.2 in paper for training objective.
+
+[Dense Passage Retrieval for Open-Domain Question Answering](https://arxiv.org/pdf/2004.04906.pdf)
+
+DPR uses BERT model for both the encoders and uses less question and passage pairs.
+
+![alt](../notes/images/7-question-answering/qa-dpr-retriever.png)
+
+#### Intializing DPR retriever
+
+We can intialize a dpr retriever with below params:
+    1. Document_store
+    2. Query encoder model
+    3. Passage encoder model
+
+```Python
+from haystack.nodes import DensePassageRetriever
+
+dpr_retriever = DensePassageRetriever(
+    document_store=document_store,
+    query_embedding_model="facebook/dpr-question_encoder-single-nq-base",
+    passage_embedding_model="facebook/dpr-ctx_encoder-single-nq-base",
+    embed_title=False,
+)
+```
+
+Later we can create embeddings for query and passage using respective models, via below code:
+ 
+```Python
+document_store.update_embeddings(
+    retriever=dpr_retriever,
+)
+```
+
+We can use the same evaluation setup as BM25 to evaluate the retriever for different k values.
+
+We can even fine-tune dpr models for a domain usinf Facebook's FAISS library.
 
 ### Evaluating the Reader
 
@@ -168,6 +367,115 @@ A binary metric that gives EM=1 if the characters in the predicted and ground tr
 Harmonic mean of precision and recall.
 
 Let's see how these metrics wit some helper functions from FARM over a simple example.
+
+We can use `compute_f1`, `compute_exact` from `haystack.modeling.evaluation.squad` to calculate these metrics.
+
+Under the hood, the prediction words are normalized(removed punctuations, fixing whitespace, lowercase). Then converting it to bag-of-words and calculate score at the token level.
+
+*How the score is calculated for multiple question answer pair?*
+
+* First the score is calculated for multiple answers paired with a question
+* Then the answer with highest score is selected over all possible answers
+* Finally average of the indiviual score is calculated to get the final score.
+
+
+The evaluation of reader is done by creating a pipeine that consists of a single node, reader in this case. Then `eval()` to evaluate the reader with labels index.
+
+```Python
+from haystack.pipelines import Pipeline
+def evaluate_reader(reader):
+    score_keys = ['exact_match', 'f1']
+    p = Pipeline()
+    p.add_node(
+        component=reader,
+        name="Reader",
+        inputs=["Query"],
+    )
+    eval_result = p.eval(
+        labels=labels_agg,
+        documents=[[label.document for label in multilabel.labels] for multilabel in labels_agg],
+        params={},
+    )
+    metrics = eval_result.calculate_metrics(simulated_top_k_reader=1)
+    return {k:v for k,v in metrics["Reader"].items() if k in score_keys}
+
+reader_eval = {}
+reader_eval["Fine-tune on SQuAD"] = evaluate_reader(reader)
+```
+
+If the results are still bad, the dataset used for pretraining on off the shelf qa model is different from the domain used. In this case we've to perform domain adaptation or fine-tune the model on our dataset.
+For this we can use haystack reader's train and save method to fine tune and save the model.
+
+* Finetuning with haystack codebase is available in notebook
+* [Finetuning with transformers based on paper is available here, Warning: implementation looks good but not yet tested](https://colab.research.google.com/drive/1dv3DE4Lp39T6F3fI466iZLdtZfpyTXHI?usp=sharing#scrollTo=V7YcIJwYCOEe)
+
+We've to reformat the input data to pretraining format used by the model.
+
+### Evaluating QA pipeline
+
+We can evaluate the entire pipeline in the same way like reader and retriever.
+
+```Python
+# Evaluation setup
+from haystack.pipelines import ExtractiveQAPipeline
+pipe = ExtractiveQAPipeline(
+    retriever=bm25_retriever,
+    reader=reader,
+)
+
+# Evaluate
+eval_result = pipe.eval(
+    labels=labels_agg,
+    params={},
+)
+metrics = eval_result.calculate_metrics(
+    simulated_top_k_reader=1,
+)
+reader_eval["QA Pipeline (top-1)"] ={
+    k:v for k,v in metrics["Reader"].items()
+    if k in ["exact_match", "f1"]
+}
+
+# Getting metrics
+# Or get QA pipeline and Reader metrics in one shot:
+# Reader evaluation is run a second time using simulated perfect retriever results
+eval_result = pipe.eval(
+    labels=labels_agg,
+    params={},
+    add_isolated_node_eval=True
+)
+metrics = eval_result.calculate_metrics(simulated_top_k_reader=1)
+# Extract metrics from reader run in isolation with simulated perfect retriever
+isolated_metrics = eval_result.calculate_metrics(simulated_top_k_reader=1, eval_mode="isolated")
+
+pipeline_reader_eval = {}
+pipeline_reader_eval["Reader"] = {
+    k:v for k,v in isolated_metrics["Reader"].items()
+    if k in ["exact_match", "f1"]}
+pipeline_reader_eval["QA Pipeline (top-1)"] = {
+    k:v for k,v in metrics["Reader"].items()
+    if k in ["exact_match", "f1"]}
+
+plot_reader_eval(pipeline_reader_eval)
+```
+
+## RAG
+
+### Going Beyond Extractive QA
+
+One interesting alternative to extracting spans of answers of text in a document is to generate them with a pretrained language model. This approach is called *abstractive or generative QA* and has the potential to produce better phrased answers than answers synthesized from mutliple passages. We'll breifly toucj on the current state of art: *retrieval-augmented generation* (RAG).
+
+RAG extends the retriever-reader architecture by replacing the reader with genereator and DPR as the retriever. The generator is a pretrained sequence-to-sequence transformer like T5 or BART that reciever latent vectors of documents from DPR then iterativley generates an anser based on the query and these documents.
+
+There are two types of generator or RAG models:
+
+*RAG-Sequence*:
+Uses the same retrieved document to generate an complete answer. In particular, the top k documents are fed to the generator, which produces and output for each document, and the result is marginalized to obtain the best answer.
+
+*RAG-token*:
+Uses different documents to generate each token in the answer. This allows the generator to synthesize evidence from multiple documents.
+
+We'll use RAG-Token models as they have better performance than RAG-Sequence ones. We'll instatiate the generator from hasytack with a different set of params.
 
 # Quick Notes:
 
