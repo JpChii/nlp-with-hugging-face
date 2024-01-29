@@ -14,7 +14,7 @@ Some applications of NER:
 * augmenting quality of search engines
 * building a strucutred database from corpus
 
-> Note: *Zero-short transfer or zero-shot learning* usually refers to the task of training a model on one set of labels and then evaluating it on a different set of labels. In the context of transformers, zero-shot learning may also refer to situations where a lnaguage model like GPT-3 is evaluated ona downstream task that it wasn't even fine tuned on.
+> Note: *Zero-short transfer or zero-shot learning* usually refers to the task of training a model on one set of labels and then evaluating it on a different set of labels. In the context of transformers, zero-shot learning may also refer to situations where a lnaguage model like GPT-3 is evaluated on a downstream task that it wasn't even fine tuned on.
 
 Problem(assumption):
 
@@ -37,7 +37,7 @@ This dataset has three entities -> PER, ORG, LOC annotated in [IOB2 scheme](http
 
 ## Multilingual Transformers
 
-The architecture and training of these transformers are same a monolingual model, the only exception is a corpus with multilingual data. A model trained on such data evn though not informed to differntiate languages, the linguistic representation learned from training performs well across multiple languages for a variety of downstream tasks. Sometimes these model perform better than monolingual models, elimintaing the need to train them.
+The architecture and training of these transformers are same a monolingual model, the only exception is a corpus with multilingual data. A model trained on such data even though not informed to differntiate languages, the linguistic representation learned from training performs well across multiple languages for a variety of downstream tasks. Sometimes these model perform better than monolingual models, elimintaing the need to train them.
 
 `Benchamrk Dataset` -> To measure the performance of cross-lingual NER, the below datasets are often used:
     * [CoNLL-2002](https://huggingface.co/datasets/conll2002) 
