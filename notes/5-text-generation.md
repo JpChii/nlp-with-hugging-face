@@ -8,7 +8,7 @@ The image shows addition, unscrambling, translation are some of the sequence tas
 
 With the advent of GPT-4 and now an open sourced LLAMA2, has given rise to lot's of applications with LLM's at its core with text generation capacity.
 
-In ![5-text-generation.ipynb](../notebooks/5-text-generation.ipynb) notebook we'l11l cover how text generation works with LLM's and how different decoding stratergies impact text generation.
+In [5-text-generation.ipynb](../notebooks/5-text-generation.ipynb) notebook we'l11l cover how text generation works with LLM's and how different decoding stratergies impact text generation.
 
 ## The Challenge with Generating coherent Text
 
